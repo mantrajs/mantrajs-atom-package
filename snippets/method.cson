@@ -1,0 +1,10 @@
+".source.js, .source.ts":
+  "Mantra Method":
+    "prefix": "method"
+    "body": """
+    Meteor.methods({
+      '$1'($2) {
+        check($2, String);
+      }
+    });    
+    """

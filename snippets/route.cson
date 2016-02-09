@@ -1,0 +1,13 @@
+".source.jsx, .source.tsx":
+  "Mantra Route":
+    "prefix": "route"
+    "body": """
+    FlowRouter.route('/', {
+      name: 'posts.list',
+      action() {
+        mount(MainLayoutCtx, {
+          content: () => (<PostList />)
+        });
+      }
+    });
+    """

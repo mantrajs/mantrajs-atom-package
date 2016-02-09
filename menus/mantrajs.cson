@@ -2,7 +2,7 @@
 'context-menu':
   'atom-text-editor': [
     {
-      'label': 'Toggle mantrajs'
+      'label': 'Toggle MantraJS'
       'command': 'mantrajs:toggle'
     }
   ]
@@ -10,11 +10,15 @@
   {
     'label': 'Packages'
     'submenu': [
-      'label': 'mantrajs'
+      'label': 'Mantra JS'
       'submenu': [
         {
           'label': 'Toggle'
           'command': 'mantrajs:toggle'
+        },
+        {
+          'label': 'Init Mantra Project'
+          'command': 'mantrajs:init'
         }
       ]
     ]

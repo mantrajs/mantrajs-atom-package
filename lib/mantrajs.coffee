@@ -1,40 +1,82 @@
-MantrajsView = require './mantrajs-view'
 {CompositeDisposable} = require 'atom'
+{requirePackages} = require 'atom-utils'
+TreeViewGitModifiedView = require './mantra-view'
+fs = require("fs-plus")
 
-module.exports = Mantrajs =
-  mantrajsView: null
-  modalPanel: null
+module.exports = TreeViewGitModified =
+
+  mantraTreeView: null
   subscriptions: null
+  isVisible: true
 
   activate: (state) ->
-    @mantrajsView = new MantrajsView(state.mantrajsViewState)
-    @modalPanel = atom.workspace.addModalPanel(item: @mantrajsView.getElement(), visible: false)
+    @mantraTreeView = new TreeViewGitModifiedView(state.mantraTreeViewState)
+    @isVisible = state.isVisible
 
     # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     @subscriptions = new CompositeDisposable
 
     # Register command that toggles this view
     @subscriptions.add atom.commands.add 'atom-workspace', 'mantrajs:toggle': => @toggle()
- 
+    @subscriptions.add atom.commands.add 'atom-workspace', 'mantrajs:init': => @init()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'mantrajs:show': => @show()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'mantrajs:hide': => @hide()
+
+    @subscriptions.add atom.project.onDidChangePaths (path) =>
+      @show()
+
+    requirePackages('tree-view').then ([treeView]) =>
+      if (!@mantraTreeView)
+        @mantraTreeView = new TreeViewGitModifiedView
+
+      if (treeView.treeView && @isVisible) or (@isVisible is undefined)
+        @mantraTreeView.show()
+
+      atom.commands.add 'atom-workspace', 'tree-view:toggle', =>
+        if treeView.treeView?.is(':visible')
+          @mantraTreeView.hide()
+        else
+          if @isVisible
+            @mantraTreeView.show()
+
+      atom.commands.add 'atom-workspace', 'tree-view:show', =>
+        if @isVisible
+          @mantraTreeView.show()
+
   deactivate: ->
-    @modalPanel.destroy()
     @subscriptions.dispose()
-    @mantrajsView.destroy()
+    @mantraTreeView.destroy()
 
   serialize: ->
-    mantrajsViewState: @mantrajsView.serialize()
+    isVisible: @isVisible
+    mantraTreeViewState: @mantraTreeView.serialize()
 
   toggle: ->
-    console.log 'Mantrajs was toggled!'
+    atom.notifications.addWarning("I must warn you!");
 
-    if @modalPanel.isVisible()
-      @modalPanel.hide()
+    if @isVisible
+      @mantraTreeView.hide()
     else
-      @modalPanel.show()
+      @mantraTreeView.show()
+    @isVisible = !@isVisible
 
-  #in main module
-  consumeAutoreload: (reloader) ->
-    reloader(pkg:"mantrajs",files:["package.json"],folders:["lib/"])
-    # pkg has to be the name of your package and is required
-    # files are watched and your package reloaded on changes, defaults to ["package.json"]
-    # folders are watched and your package reloaded on changes, defaults to ["lib/"]
+  show: ->
+    @mantraTreeView.show()
+    @isVisible = true
+
+  hide: ->
+    @mantraTreeView.hide()
+    @isVisible = false
+
+  init: ->
+    pathFrom = atom.packages.resolvePackagePath("mantrajs/templates/app/client");
+    pathTo =  atom.project.resolvePath("client");
+    fs.copySync(pathFrom, pathTo)
+
+    pathFrom = atom.packages.resolvePackagePath("mantrajs/templates/app/server");
+    pathTo =  atom.project.resolvePath("server");
+    fs.copySync(pathFrom, pathTo)
+
+    pathFrom = atom.packages.resolvePackagePath("mantrajs/templates/app/lib");
+    pathTo =  atom.project.resolvePath("lib");
+    fs.copySync(pathFrom, pathTo)
