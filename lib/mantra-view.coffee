@@ -20,13 +20,13 @@ class TreeViewGitModifiedView
 
     @paneSub = new CompositeDisposable
 
-    @loadDirectories()
+    #@loadDirectories()
     #
     # @paneSub.add atom.project.onDidChangePaths (path) =>
     #   @annotate()
 
     # @paneSub.add atom.workspace.observePanes (pane) =>
-    #   @treeViewGitModifiedPaneView.setPane pane
+    #   @mantraPaneView.setPane pane
       # TODO: Implement tear down on pane destroy subscription if needed (TBD)
       # destroySub = pane.onDidDestroy =>
       #   destroySub.dispose()
@@ -35,6 +35,11 @@ class TreeViewGitModifiedView
 
   loadDirectories: ->
     self = this
+
+    dir = atom.project.resolvePath("client/modules")
+    unless fs.existsSync(dir)
+      atom.notifications.addWarning("This is not a Mantra project, client/modules directory missing!");
+      return
 
     # Remove all existing panels
     for tree in @mantraPanes
@@ -48,13 +53,13 @@ class TreeViewGitModifiedView
 
           #      tree.show()
           #else
-            @treeViewGitModifiedPaneView = new TreeViewGitModifiedPaneView repo
-            #treeViewGitModifiedPaneView.setRepo repo
-            self.mantraPanes.push treeViewGitModifiedPaneView
-            self.element.appendChild treeViewGitModifiedPaneView.element
+            @mantraPaneView = new TreeViewGitModifiedPaneView repo
+            #mantraPaneView.setRepo repo
+            self.mantraPanes.push mantraPaneView
+            self.element.appendChild mantraPaneView.element
 
-          #  self.paneSub.add atom.workspace.observePanes (pane) =>
-          #      treeViewGitModifiedPaneView.setPane pane
+            self.paneSub.add atom.workspace.observePanes (pane) =>
+              mantraPaneView.setPane pane
 
 
   # Returns an object that can be retrieved when package is activated
@@ -92,6 +97,8 @@ class TreeViewGitModifiedView
 
   # Append pane before the tree view
   show: ->
+    @loadDirectories()
+
     requirePackages('tree-view').then ([treeView]) =>
       @treeView = treeView.treeView
       @treeView.find('.tree-view-scroller').css 'background', treeView.treeView.find('.tree-view').css 'background'

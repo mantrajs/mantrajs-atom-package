@@ -7,7 +7,7 @@ module.exports = TreeViewGitModified =
 
   mantraTreeView: null
   subscriptions: null
-  isVisible: true
+  isVisible: false
 
   activate: (state) ->
     @mantraTreeView = new TreeViewGitModifiedView(state.mantraTreeViewState)
@@ -52,8 +52,6 @@ module.exports = TreeViewGitModified =
     mantraTreeViewState: @mantraTreeView.serialize()
 
   toggle: ->
-    atom.notifications.addWarning("I must warn you!");
-
     if @isVisible
       @mantraTreeView.hide()
     else
@@ -61,6 +59,8 @@ module.exports = TreeViewGitModified =
     @isVisible = !@isVisible
 
   show: ->
+    atom.notifications.addWarning("I must warn you, this is only alpha!");
+    
     @mantraTreeView.show()
     @isVisible = true
 

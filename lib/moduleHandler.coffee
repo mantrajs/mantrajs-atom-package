@@ -72,10 +72,17 @@ class ModuleHandler
 
     [rootProjectPath, relativeDirectoryPath] = atom.project.relativizePath(selectedPath)
 
-    new DirectoryHandler("Actions", @container, relativeDirectoryPath + "/actions", "action.js")
-    new DirectoryHandler("Components", @container, relativeDirectoryPath + "/components", "component.js")
-    new DirectoryHandler("Configs", @container, relativeDirectoryPath + "/configs")
-    new DirectoryHandler("Containers", @container, relativeDirectoryPath + "/containers", "container.js")
+    #new DirectoryHandler("Actions", @container, relativeDirectoryPath + "/actions", "action.js")
+    #new DirectoryHandler("Components", @container, relativeDirectoryPath + "/components", "component.js")
+    #new DirectoryHandler("Configs", @container, relativeDirectoryPath + "/configs")
+    #new DirectoryHandler("Containers", @container, relativeDirectoryPath + "/containers", "container.js")
+
+    new DirectoryHandler(null, @container, relativeDirectoryPath, null, {
+      "actions": "action.js",
+      "components": "component.js",
+      "containers": "container.js"
+    })
+
 
   clear: (elem) ->
     while (elem.firstChild)

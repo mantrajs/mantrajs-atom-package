@@ -1,24 +1,27 @@
 {$} = require 'space-pen'
+fs = require("fs-plus")
 
 AddDialog = null
 
 module.exports =
 class DirectoryHandler
-  constructor: (name, parent, path, template) ->
+  @selectedElement: null
+
+  constructor: (name, parent, path, template, childTemplates) ->
     self = this
     @name = name
     @template = template
+    @childTemplates = childTemplates
     @path = path
 
     func = null;
     if (template)
-      func = @create.bind(this)
-
+      func = @create.bind(this, template, name, path)
 
     @container = DirectoryHandler.createList(name, parent, func)
 
     dir = atom.project.resolvePath(path)
-    unless atom.project.contains(dir)
+    unless fs.existsSync(dir)
       atom.notifications.addWarning("This is not a Mantra project, " + path + " directory missing!");
 
     @methodDir = atom.project.getDirectories()[0].getSubdirectory(path)
@@ -32,6 +35,8 @@ class DirectoryHandler
 
     $(@container).on 'click', '.list-item[is=tree-view-file]', ->
       atom.workspace.open(this.file.path)
+      this.getPath = () -> return this.file.path # TODO: Check other options
+      DirectoryHandler.select(this)
 
   loadDirectory: (dir, container) ->
     files = dir.getEntriesSync()
@@ -40,14 +45,20 @@ class DirectoryHandler
       if (file.isFile())
         DirectoryHandler.addFile(container, file)
       if (file.isDirectory())
-        newDir = DirectoryHandler.createList(file.getBaseName(), container)
-        @loadDirectory(file, newDir)
+        name = file.getBaseName()
+        [rootProjectPath, relativeDirectoryPath] = atom.project.relativizePath(file.path)
 
-  create: ->
-    path = atom.project.resolvePath(@path)
+        if (@childTemplates)
+          # this is template directory so create a new directory handler
+          new DirectoryHandler(name, container, relativeDirectoryPath, @childTemplates[name], @childTemplates)
+        else
+          new DirectoryHandler(name, container, relativeDirectoryPath)
+
+  create: (template, name, path) ->
+    path = atom.project.resolvePath(path)
 
     AddDialog ?= require './add-module-dialog'
-    dialog = new AddDialog(path, "/templates/parts", @template, @name.toLowerCase())
+    dialog = new AddDialog(path, "/templates/parts", template, name.toLowerCase())
 
     dialog.attach()
 
@@ -56,6 +67,18 @@ class DirectoryHandler
   clear: (elem) ->
     while (elem.firstChild)
       elem.removeChild(elem.firstChild);
+
+  @select: (elem) ->
+    if elem == DirectoryHandler.selectedElement
+      return
+
+    if DirectoryHandler.selectedElement
+      DirectoryHandler.selectedElement?.classList.remove 'mselected'
+
+    DirectoryHandler.selectedElement = elem
+    DirectoryHandler.selectedElement.classList.add 'selected'
+    DirectoryHandler.selectedElement.classList.add 'mselected'
+
 
   @addFile: (parent, file) ->
     listItem = document.createElement('li')
@@ -72,24 +95,45 @@ class DirectoryHandler
     parent.appendChild listItem
 
   @createList: (headerText, parent, func) ->
-    clientHeader = document.createElement('div')
-    clientHeader.classList.add('header', 'list-item')
-
-    clientSpan = document.createElement('span')
-    clientSpan.innerText = headerText
-    clientSpan.classList.add('name', 'icon', 'icon-file-directory')
-
-    clientHeader.appendChild clientSpan
 
     client = document.createElement('li');
 
-    #tests are collapsed, everything else is expanded
-    if headerText == "tests"
-      client.classList.add('mantra', 'list-nested-item', 'collapsed')
-    else
-      client.classList.add('mantra', 'list-nested-item', 'expanded')
+    # header
 
-    client.appendChild clientHeader
+    if headerText
+      clientHeader = document.createElement('div')
+      clientHeader.classList.add('header', 'list-item')
+
+      clientSpan = document.createElement('span')
+      clientSpan.innerText = headerText
+      clientSpan.classList.add('name', 'icon', 'icon-file-directory')
+
+      clientHeader.appendChild clientSpan
+      client.appendChild clientHeader
+
+      #tests are collapsed, everything else is expanded
+      if headerText == "tests"
+        client.classList.add('mantra', 'list-nested-item', 'collapsed')
+      else
+        client.classList.add('mantra', 'list-nested-item', 'expanded')
+
+      if func
+        button = document.createElement('button')
+        button.classList.add('pull-right', 'mantra', 'addButton')
+
+        buttonSpan = document.createElement('div')
+        buttonSpan.innerText = "+"
+        buttonSpan.classList.add('mantra', 'addText')
+
+        button.appendChild(buttonSpan)
+        button.onclick = (e) ->
+          e.stopPropagation()
+          e.preventDefault()
+          return func()
+
+
+        clientHeader.appendChild button
+
 
     clientList = document.createElement('ol')
     clientList.classList.add('entries', 'list-tree')
@@ -103,20 +147,6 @@ class DirectoryHandler
       nested.toggleClass('expanded')
       nested.toggleClass('collapsed')
 
-    if func
-      button = document.createElement('button')
-      button.classList.add('pull-right', 'mantra', 'addButton')
 
-      buttonSpan = document.createElement('div')
-      buttonSpan.innerText = "+"
-      buttonSpan.classList.add('mantra', 'addText')
-
-      button.appendChild(buttonSpan)
-      button.onclick = (e) ->
-        e.stopPropagation()
-        e.preventDefault()
-        return func()
-
-      clientHeader.appendChild button
 
     return clientList
