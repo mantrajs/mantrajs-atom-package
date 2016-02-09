@@ -19,6 +19,7 @@
     "lodash": "^2.4.1",
     "space-pen": "^3.8.0",
     "fs-extra": "^0.26.0",
+    "fs-plus": "^2.8.1",
     "atom-space-pen-views": "^1.0.0"
   }
 }
