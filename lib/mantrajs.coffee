@@ -4,6 +4,19 @@ TreeViewGitModifiedView = require './mantra-view'
 fs = require("fs-plus")
 
 module.exports = TreeViewGitModified =
+  config:
+    language:
+      type: 'string'
+      default: 'Javascript'
+      enum: ["Javascript", "Typescript"]
+    projectRoot:
+      type: 'string'
+      default: ''
+      description: "Defines the directory which is root to server/client and lib folder"
+    libFolderName:
+      type: 'string'
+      default: 'lib'
+      description: "Defines the name of the lib folder"
 
   mantraTreeView: null
   subscriptions: null
@@ -60,7 +73,7 @@ module.exports = TreeViewGitModified =
 
   show: ->
     atom.notifications.addWarning("I must warn you, this is only alpha!");
-    
+
     @mantraTreeView.show()
     @isVisible = true
 

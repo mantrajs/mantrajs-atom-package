@@ -36,7 +36,11 @@ class TreeViewGitModifiedView
   loadDirectories: ->
     self = this
 
-    dir = atom.project.resolvePath("client/modules")
+    root = atom.config.get('mantrajs.projectRoot');
+    if root
+      root += "/"
+
+    dir = atom.project.resolvePath(root + "client/modules")
     unless fs.existsSync(dir)
       atom.notifications.addWarning("This is not a Mantra project, client/modules directory missing!");
       return

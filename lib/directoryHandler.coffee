@@ -33,16 +33,22 @@ class DirectoryHandler
     @clear(@container)
     @loadDirectory(@methodDir, @container)
 
-    $(@container).on 'click', '.list-item[is=tree-view-file]', ->
+    $(@container).on 'click', '.list-item[is=tree-view-file]', (e) ->
       atom.workspace.open(this.file.path)
       this.getPath = () -> return this.file.path # TODO: Check other options
       DirectoryHandler.select(this)
+
+    $(@container).on 'contextmenu', '.list-item[is=tree-view-file]', (e) ->
+      e.stopPropagation()
+      e.preventDefault()
 
   loadDirectory: (dir, container) ->
     files = dir.getEntriesSync()
 
     for file in files
       if (file.isFile())
+        if file.getBaseName()[0] == "."
+          continue
         DirectoryHandler.addFile(container, file)
       if (file.isDirectory())
         name = file.getBaseName()
@@ -58,7 +64,15 @@ class DirectoryHandler
     path = atom.project.resolvePath(path)
 
     AddDialog ?= require './add-module-dialog'
-    dialog = new AddDialog(path, "/templates/parts", template, name.toLowerCase())
+
+    lang = "js";
+    if (atom.config.get('mantrajs.language') == "Typescript")
+      lang = "ts"
+
+    dialog = new AddDialog(path,
+      DirectoryHandler.resolvePath("/templates/$lang/parts"),
+      DirectoryHandler.resolvePath("template.$lang"),
+      name.toLowerCase())
 
     dialog.attach()
 
@@ -67,6 +81,12 @@ class DirectoryHandler
   clear: (elem) ->
     while (elem.firstChild)
       elem.removeChild(elem.firstChild);
+
+  @resolvePath: (path) ->
+    lang = "js";
+    if (atom.config.get('mantrajs.language') == "Typescript")
+      lang = "ts"
+    return path.replace("$lang", lang)
 
   @select: (elem) ->
     if elem == DirectoryHandler.selectedElement
@@ -147,6 +167,8 @@ class DirectoryHandler
       nested.toggleClass('expanded')
       nested.toggleClass('collapsed')
 
-
+    $(clientHeader).on 'contextmenu', (e) ->
+      e.stopPropagation()
+      e.preventDefault()
 
     return clientList

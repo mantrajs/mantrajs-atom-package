@@ -53,15 +53,19 @@ class TreeViewOpenFilesPaneView
     serverFields.classList.add('mantra', 'pane')
     @element.appendChild(serverFields)
 
-    new DirectoryHandler("Methods", serverFields, "server/methods", "method.js")
+    root = atom.config.get('mantrajs.projectRoot');
+    if root
+      root += "/"
+
+    new DirectoryHandler("methods", serverFields, root + "server/methods", "method")
 
     # add publications
 
-    new DirectoryHandler("Publications", serverFields, "server/publications", "publication.js")
+    new DirectoryHandler("publications", serverFields, root + "server/publications", "publication")
 
     # add lib directory
 
-    new DirectoryHandler("Library", serverFields, "lib")
+    new DirectoryHandler("library", serverFields, root + atom.config.get('mantrajs.libFolderName'))
 
   setPane: (pane) ->
     @paneSub.add pane.observeActiveItem (item) =>
