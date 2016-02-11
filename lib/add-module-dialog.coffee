@@ -1,7 +1,7 @@
 path = require 'path'
-#fs = require 'fs-plus'
 fs = require 'fs-extra'
 Dialog = require './dialog'
+DirectoryHandler = require './directoryHandler'
 
 module.exports =
 class AddDialog extends Dialog
@@ -50,12 +50,11 @@ class AddDialog extends Dialog
       #     @trigger 'file-created', [newPath]
       #     @close()
       else
+        # copy all template files and create all directories
         fromPath = atom.packages.resolvePackagePath("mantrajs/" + @templatePath); # TODO: use path.combine
         if @fileName
           fromPath += "/" + @fileName
         fs.copySync(fromPath, newPath)
-
-        # copy all template files and create all directories
 
         @trigger 'module-created', [newPath]
         @cancel()

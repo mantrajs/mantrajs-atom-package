@@ -1,7 +1,7 @@
 {CompositeDisposable} = require 'atom'
 {requirePackages} = require 'atom-utils'
 TreeViewGitModifiedView = require './mantra-view'
-fs = require("fs-plus")
+fs = require("fs-extra")
 
 module.exports = TreeViewGitModified =
   config:

@@ -2,8 +2,11 @@
 _ = require 'lodash'
 {$} = require 'space-pen'
 fs = require('fs-extra')
+fspath = require('path')
+
 DirectoryHandler = require('./directoryHandler')
 ModuleHandler = require('./moduleHandler')
+Config = require('./configHandler')
 
 AddDialog = null  # Defer requiring until actually needed
 
@@ -45,6 +48,13 @@ class TreeViewOpenFilesPaneView
     moduleFields.classList.add('mantra', 'pane')
     @element.appendChild(moduleFields)
 
+    DirectoryHandler.checkCreateDirectory(Config.get("root") + "client/configs");
+    DirectoryHandler.checkCreateFile(Config.get("root") + "client/configs/context.$lang", "templates/$lang/app/client/configs/context.$lang");
+
+    DirectoryHandler.checkCreateFile(Config.get("root") + "client/main.$lang", "templates/$lang/app/client/main.$lang");
+
+    # check create module directory
+    DirectoryHandler.checkCreateDirectory(Config.get("root") + "client/modules");
     moduleHandler = new ModuleHandler(moduleFields)
 
     # add server methods
@@ -53,19 +63,43 @@ class TreeViewOpenFilesPaneView
     serverFields.classList.add('mantra', 'pane')
     @element.appendChild(serverFields)
 
-    root = atom.config.get('mantrajs.projectRoot');
-    if root
-      root += "/"
+    new DirectoryHandler("methods", serverFields, Config.get("root") + "server/methods", "method", null, (event, newPath) ->
+      # find the name of the new module
+      name = fspath.basename(newPath, ".js")
+      name = fspath.basename(name, ".ts")
 
-    new DirectoryHandler("methods", serverFields, root + "server/methods", "method")
+      # modify main.js
+      mainFile = DirectoryHandler.resolvePath("server/methods/index.$lang", true, true);
+
+      DirectoryHandler.replaceInFile(mainFile, [
+          "export default function () {", "import " + name + " from \"./" + name + "\";\nexport default function () {",
+          "export default function () {", "export default function () {\n    " + name + "();"
+      ])
+    )
 
     # add publications
 
-    new DirectoryHandler("publications", serverFields, root + "server/publications", "publication")
+    new DirectoryHandler("publications", serverFields, Config.get("root") + "server/publications", "publication", null, (event, newPath) ->
+      # find the name of the new module
+      name = fspath.basename(newPath, ".js")
+      name = fspath.basename(name, ".ts")
+
+      # modify main.js
+      mainFile = DirectoryHandler.resolvePath("server/publications/index.$lang", true, true);
+
+      DirectoryHandler.replaceInFile(mainFile, [
+          "export default function () {", "import " + name + " from \"./" + name + "\";\nexport default function () {",
+          "export default function () {", "export default function () {\n    " + name + "();"
+      ])
+    )
 
     # add lib directory
+    new DirectoryHandler("library", serverFields, Config.get("root") + Config.get("libFolderName"))
 
-    new DirectoryHandler("library", serverFields, root + atom.config.get('mantrajs.libFolderName'))
+    # add main server file
+    DirectoryHandler.checkCreateFile(Config.get("root") + "server/main.$lang", "templates/$lang/app/server/main.$lang");
+    DirectoryHandler.checkCreateFile(Config.get("root") + "server/methods/index.$lang", "templates/$lang/app/server/methods/index.$lang");
+    DirectoryHandler.checkCreateFile(Config.get("root") + "server/publications/index.$lang", "templates/$lang/app/server/publications/index.$lang");
 
   setPane: (pane) ->
     @paneSub.add pane.observeActiveItem (item) =>

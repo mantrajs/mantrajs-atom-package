@@ -1,5 +1,6 @@
 {$} = require 'space-pen'
 DirectoryHandler = require('./directoryHandler')
+fspath = require 'path'
 
 AddDialog = null
 
@@ -8,7 +9,7 @@ class ModuleHandler
   constructor: (parent) ->
     self = this
 
-    @path = DirectoryHandler.resolvePath("$root/client/modules")
+    @path = DirectoryHandler.resolvePath("client/modules", false, true)
 
     # add controls
     label = document.createElement('span')
@@ -55,13 +56,24 @@ class ModuleHandler
     @moduleList.onchange();
 
   createModule: ->
-    path = DirectoryHandler.resolvePath("$root/client/modules")
-    path = atom.project.resolvePath(path)
+    path = DirectoryHandler.resolvePath("client/modules", true, true)
 
     AddDialog ?= require './add-module-dialog'
     dialog = new AddDialog(path,
       DirectoryHandler.resolvePath("/templates/$lang/parts/module"),
       null, "module")
+
+    dialog.on "module-created", (event, newPath) ->
+      # find the name of the new module
+      name = fspath.basename(newPath)
+
+      # modify main.js
+      mainFile = DirectoryHandler.resolvePath("client/main.$lang", true, true);
+
+      DirectoryHandler.replaceInFile(mainFile, [
+          "import {createApp} from 'mantra-core';", "import {createApp} from 'mantra-core';\nimport " + name  + "Module from \"./modules/" + name + "\";",
+          "app.init();", "app.loadModule(" + name + "Module);\napp.init();"
+      ])
 
     dialog.attach()
 
@@ -71,6 +83,9 @@ class ModuleHandler
     @clear(@container)
 
     sel = @moduleList
+    unless sel.selectedOptions[0]
+      return
+      
     selectedPath = sel.selectedOptions[0].file.path;
 
     [rootProjectPath, relativeDirectoryPath] = atom.project.relativizePath(selectedPath)

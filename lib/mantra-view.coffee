@@ -1,8 +1,10 @@
-fs = require("fs-plus")
+fs = require("fs-extra")
 path = require 'path'
 
 {requirePackages} = require 'atom-utils'
 {CompositeDisposable} = require 'event-kit'
+Config = require('./configHandler')
+DirectoryHandler = require('./directoryHandler')
 
 TreeViewGitModifiedPaneView = require './mantra-pane-view'
 
@@ -36,14 +38,12 @@ class TreeViewGitModifiedView
   loadDirectories: ->
     self = this
 
-    root = atom.config.get('mantrajs.projectRoot');
-    if root
-      root += "/"
+    DirectoryHandler.checkCreateFile("mantra.json", "templates/mantra.json");
 
-    dir = atom.project.resolvePath(root + "client/modules")
-    unless fs.existsSync(dir)
-      atom.notifications.addWarning("This is not a Mantra project, client/modules directory missing!");
-      return
+    # dir = DirectoryHandler.resolvePath("client/modules", true, true)
+    # unless fs.existsSync(dir)
+    #   atom.notifications.addWarning("This is not a Mantra project, client/modules directory missing!");
+    #   return
 
     # Remove all existing panels
     for tree in @mantraPanes

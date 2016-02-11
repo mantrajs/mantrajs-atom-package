@@ -1,5 +1,7 @@
 {$} = require 'space-pen'
-fs = require("fs-plus")
+fs = require("fs-extra")
+fsPath = require("path")
+Config = require("./configHandler")
 
 AddDialog = null
 
@@ -7,12 +9,16 @@ module.exports =
 class DirectoryHandler
   @selectedElement: null
 
-  constructor: (name, parent, path, template, childTemplates) ->
+  constructor: (name, parent, path, template, childTemplates, callback) ->
     self = this
     @name = name
     @template = template
     @childTemplates = childTemplates
     @path = path
+    @callback = callback
+
+    # check and create directory
+    DirectoryHandler.checkCreateDirectory(path);
 
     func = null;
     if (template)
@@ -74,6 +80,7 @@ class DirectoryHandler
       DirectoryHandler.resolvePath(template + ".$lang"),
       name.toLowerCase())
 
+    dialog.on "module-created", @callback
     dialog.attach()
 
     return false
@@ -82,13 +89,36 @@ class DirectoryHandler
     while (elem.firstChild)
       elem.removeChild(elem.firstChild);
 
-  @resolvePath: (path) ->
+  @checkCreateDirectory: (dir) ->
+    dirPath = DirectoryHandler.resolvePath(dir, true)
+
+    unless fs.existsSync dirPath
+      fs.ensureDirSync dirPath
+      atom.notifications.addInfo "Mantra directory created: " + dir
+
+  @checkCreateFile: (file, template) ->
+    findFile = DirectoryHandler.resolvePath(file, true)
+    unless fs.existsSync findFile
+      templateFile = DirectoryHandler.resolvePath(template, true)
+
+      [rootProjectPath, relativePath] = atom.project.relativizePath(findFile)
+
+      fs.copySync templateFile, findFile
+      atom.notifications.addInfo "Mantra file created: " + relativePath
+
+  @resolvePath: (path, absolute, addRoot) ->
     lang = "js";
     if (atom.config.get('mantrajs.language') == "Typescript")
       lang = "ts"
-    root = atom.config.get('mantrajs.projectRoot');
 
-    return path.replace("$lang", lang).replace("$root", root)
+    path = path.replace(/\$lang/g, lang)
+
+    if (addRoot)
+      path = Config.get("root") + path
+
+    if absolute
+      return atom.project.resolvePath(path)
+    else return path
 
   @select: (elem) ->
     if elem == DirectoryHandler.selectedElement
@@ -101,6 +131,19 @@ class DirectoryHandler
     DirectoryHandler.selectedElement.classList.add 'selected'
     DirectoryHandler.selectedElement.classList.add 'mselected'
 
+  @replaceInFile: (path, replacements) ->
+    fs.readFile(path, 'utf8', (err, data) ->
+      if err
+        return console.log(err);
+
+      for i in [0...replacements.length/2]
+        data = data.replace(replacements[i*2], replacements[i*2+1]);
+
+      fs.writeFile(path, data, 'utf8', (err) ->
+         if err
+           return console.log(err);
+      );
+    );
 
   @addFile: (parent, file) ->
     listItem = document.createElement('li')

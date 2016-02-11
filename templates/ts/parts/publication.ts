@@ -1,10 +1,10 @@
-import {Meteor} from 'meteor/meteor';
-import {check} from 'meteor/check';
+//import {Meteor} from 'meteor/meteor';
+//import {check} from 'meteor/check';
 
 // import {Posts, Comments} from '/lib/collections';
 
 export default function () {
-  Meteor.publish('$1', function () {
+  Meteor.publish("$1", function () {
     const selector = {};
     const options = {
       fields: {_id: 1, title: 1},
