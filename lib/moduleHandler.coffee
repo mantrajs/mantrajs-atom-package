@@ -8,11 +8,7 @@ class ModuleHandler
   constructor: (parent) ->
     self = this
 
-    root = atom.config.get('mantrajs.projectRoot');
-    if root
-      root += "/"
-
-    @path = root + "client/modules"
+    @path = DirectoryHandler.resolvePath("$root/client/modules")
 
     # add controls
     label = document.createElement('span')
@@ -59,7 +55,8 @@ class ModuleHandler
     @moduleList.onchange();
 
   createModule: ->
-    path = atom.project.resolvePath("client/modules")
+    path = DirectoryHandler.resolvePath("$root/client/modules")
+    path = atom.project.resolvePath(path)
 
     AddDialog ?= require './add-module-dialog'
     dialog = new AddDialog(path,

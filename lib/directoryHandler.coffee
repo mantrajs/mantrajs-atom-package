@@ -71,7 +71,7 @@ class DirectoryHandler
 
     dialog = new AddDialog(path,
       DirectoryHandler.resolvePath("/templates/$lang/parts"),
-      DirectoryHandler.resolvePath("template.$lang"),
+      DirectoryHandler.resolvePath(template + ".$lang"),
       name.toLowerCase())
 
     dialog.attach()
@@ -86,7 +86,9 @@ class DirectoryHandler
     lang = "js";
     if (atom.config.get('mantrajs.language') == "Typescript")
       lang = "ts"
-    return path.replace("$lang", lang)
+    root = atom.config.get('mantrajs.projectRoot');
+
+    return path.replace("$lang", lang).replace("$root", root)
 
   @select: (elem) ->
     if elem == DirectoryHandler.selectedElement
