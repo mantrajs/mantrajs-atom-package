@@ -38,7 +38,7 @@ class TreeViewGitModifiedView
   loadDirectories: ->
     self = this
 
-    DirectoryHandler.checkCreateFile("mantra.json", "templates/mantra.json");
+    DirectoryHandler.checkCreateFile("mantra.json", "templates/mantra.json")
 
     # dir = DirectoryHandler.resolvePath("client/modules", true, true)
     # unless fs.existsSync(dir)
@@ -50,21 +50,20 @@ class TreeViewGitModifiedView
       tree.hide()
 
     atom.project.getDirectories().map (repo) ->
-        #for repo in repos
-          #if repo.repo == null
-          #  for tree in self.mantraPanes
-          #    if repo.path == tree.repo.path
+      #for repo in repos
+        #if repo.repo == null
+        #  for tree in self.mantraPanes
+        #    if repo.path == tree.repo.path
 
-          #      tree.show()
-          #else
-            @mantraPaneView = new TreeViewGitModifiedPaneView repo
-            #mantraPaneView.setRepo repo
-            self.mantraPanes.push mantraPaneView
-            self.element.appendChild mantraPaneView.element
+        #      tree.show()
+        #else
+      @mantraPaneView = new TreeViewGitModifiedPaneView repo
+      #mantraPaneView.setRepo repo
+      self.mantraPanes.push mantraPaneView
+      self.element.appendChild mantraPaneView.element
 
-            self.paneSub.add atom.workspace.observePanes (pane) =>
-              mantraPaneView.setPane pane
-
+      self.paneSub.add atom.workspace.observePanes (pane) ->
+        mantraPaneView.setPane pane
 
   # Returns an object that can be retrieved when package is activated
   serialize: ->

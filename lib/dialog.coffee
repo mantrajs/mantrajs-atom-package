@@ -21,7 +21,7 @@ class Dialog extends View
           for j in [0...optionTexts.length]
             val = optionTexts[j]
             if val
-              regex = new RegExp("\\$" + (j + 1), "g");
+              regex = new RegExp("\\$" + (j + 1), "g")
               text = text.replace(regex, val)
 
           label.text(text)

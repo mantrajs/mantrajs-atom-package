@@ -58,9 +58,9 @@ class AddDialog extends Dialog
       #     @close()
       else
         # copy all template files and create all directories
-        fromPath = atom.packages.resolvePackagePath("mantrajs/" + @templatePath); # TODO: use path.combine
+        fromPath = atom.packages.resolvePackagePath("mantrajs/" + @templatePath) # TODO: use path.combine
         if @fileName
-          fs.writeFileSync(newPath, @templateView.text());
+          fs.writeFileSync(newPath, @templateView.text())
           #fromPath += "/" + @fileName
         else
           fs.copySync(fromPath, newPath)
