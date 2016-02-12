@@ -1,11 +1,12 @@
 path = require 'path'
 fs = require 'fs-extra'
+fso = require 'fs'
 Dialog = require './dialog'
 DirectoryHandler = require './directoryHandler'
 
 module.exports =
 class AddDialog extends Dialog
-  constructor: (initialPath, templatePath, fileName, title) ->
+  constructor: (initialPath, templatePath, fileName, title, options) ->
 
     # if fs.isFileSync(initialPath)
     #   directoryPath = path.dirname(initialPath)
@@ -19,11 +20,17 @@ class AddDialog extends Dialog
     [@rootProjectPath, relativeDirectoryPath] = atom.project.relativizePath(directoryPath)
     relativeDirectoryPath += path.sep if relativeDirectoryPath.length > 0
 
+    if templatePath && fileName
+      tp = atom.packages.resolvePackagePath("mantrajs/" + templatePath) + "/" + fileName
+      templateText = fso.readFileSync(tp, 'utf8')
+
     super
       prompt: "Enter the name of the new " + title
       initialPath: relativeDirectoryPath
       select: false
       iconClass: 'icon-file-directory-create'
+      options: options
+      templateText: templateText
 
   onConfirm: (newPath) ->
     newPath = atom.project.resolvePath(newPath)
@@ -53,8 +60,10 @@ class AddDialog extends Dialog
         # copy all template files and create all directories
         fromPath = atom.packages.resolvePackagePath("mantrajs/" + @templatePath); # TODO: use path.combine
         if @fileName
-          fromPath += "/" + @fileName
-        fs.copySync(fromPath, newPath)
+          fs.writeFileSync(newPath, @templateView.text());
+          #fromPath += "/" + @fileName
+        else
+          fs.copySync(fromPath, newPath)
 
         @trigger 'module-created', [newPath]
         @cancel()

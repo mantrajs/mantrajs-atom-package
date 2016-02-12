@@ -63,6 +63,13 @@ class TreeViewOpenFilesPaneView
     serverFields.classList.add('mantra', 'pane')
     @element.appendChild(serverFields)
 
+    # add main server file
+    DirectoryHandler.checkCreateDirectory(Config.get("root") + "server/methods");
+    DirectoryHandler.checkCreateFile(Config.get("root") + "server/main.$lang", "templates/$lang/app/server/main.$lang");
+    DirectoryHandler.checkCreateFile(Config.get("root") + "server/methods/index.$lang", "templates/$lang/app/server/methods/index.$lang");
+    DirectoryHandler.checkCreateDirectory(Config.get("root") + "server/publications");
+    DirectoryHandler.checkCreateFile(Config.get("root") + "server/publications/index.$lang", "templates/$lang/app/server/publications/index.$lang");
+
     new DirectoryHandler("methods", serverFields, Config.get("root") + "server/methods", "method", null, (event, newPath) ->
       # find the name of the new module
       name = fspath.basename(newPath, ".js")
@@ -75,6 +82,7 @@ class TreeViewOpenFilesPaneView
           "export default function () {", "import " + name + " from \"./" + name + "\";\nexport default function () {",
           "export default function () {", "export default function () {\n    " + name + "();"
       ])
+    , ["Method Name", "Parameter Name"]
     )
 
     # add publications
@@ -91,15 +99,11 @@ class TreeViewOpenFilesPaneView
           "export default function () {", "import " + name + " from \"./" + name + "\";\nexport default function () {",
           "export default function () {", "export default function () {\n    " + name + "();"
       ])
+    , ["Publication Name", "Collection Name"]
     )
 
     # add lib directory
     new DirectoryHandler("library", serverFields, Config.get("root") + Config.get("libFolderName"))
-
-    # add main server file
-    DirectoryHandler.checkCreateFile(Config.get("root") + "server/main.$lang", "templates/$lang/app/server/main.$lang");
-    DirectoryHandler.checkCreateFile(Config.get("root") + "server/methods/index.$lang", "templates/$lang/app/server/methods/index.$lang");
-    DirectoryHandler.checkCreateFile(Config.get("root") + "server/publications/index.$lang", "templates/$lang/app/server/publications/index.$lang");
 
   setPane: (pane) ->
     @paneSub.add pane.observeActiveItem (item) =>

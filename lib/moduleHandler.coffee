@@ -64,6 +64,8 @@ class ModuleHandler
       null, "module")
 
     dialog.on "module-created", (event, newPath) ->
+      dialog.load()
+      
       # find the name of the new module
       name = fspath.basename(newPath)
 
@@ -85,7 +87,7 @@ class ModuleHandler
     sel = @moduleList
     unless sel.selectedOptions[0]
       return
-      
+
     selectedPath = sel.selectedOptions[0].file.path;
 
     [rootProjectPath, relativeDirectoryPath] = atom.project.relativizePath(selectedPath)
@@ -96,9 +98,14 @@ class ModuleHandler
     #new DirectoryHandler("Containers", @container, relativeDirectoryPath + "/containers", "container.js")
 
     new DirectoryHandler(null, @container, relativeDirectoryPath, null, {
-      "actions": "action",
-      "components": "component",
-      "containers": "container"
+      "actions":
+        "file": "action"
+      "components":
+        "file": "component"
+        "options": ["Class Name"]
+      "containers":
+        "file": "container"
+        "options": ["Component Name", "Parameters", "Subscription", "Collection"]
     })
 
 

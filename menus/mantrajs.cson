@@ -9,16 +9,11 @@
 'menu': [
   {
     'label': 'Packages'
-    'submenu': [
-      'label': 'Mantra JS'
+qweqwe      'label': 'Mantra JS'
       'submenu': [
         {
           'label': 'Toggle'
           'command': 'mantrajs:toggle'
-        },
-        {
-          'label': 'Init Mantra Project'
-          'command': 'mantrajs:init'
         }
       ]
     ]

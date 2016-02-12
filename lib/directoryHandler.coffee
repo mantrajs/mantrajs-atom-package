@@ -9,13 +9,14 @@ module.exports =
 class DirectoryHandler
   @selectedElement: null
 
-  constructor: (name, parent, path, template, childTemplates, callback) ->
+  constructor: (name, parent, path, template, childTemplates, callback, dialogOptions) ->
     self = this
     @name = name
     @template = template
     @childTemplates = childTemplates
     @path = path
     @callback = callback
+    @dialogOptions = dialogOptions
 
     # check and create directory
     DirectoryHandler.checkCreateDirectory(path);
@@ -31,7 +32,9 @@ class DirectoryHandler
       atom.notifications.addWarning("This is not a Mantra project, " + path + " directory missing!");
 
     @methodDir = atom.project.getDirectories()[0].getSubdirectory(path)
-    @methodDir.onDidChange(() -> self.load())
+    @methodDir.onDidChange(() ->
+      self.load()
+    )
 
     @load()
 
@@ -60,9 +63,10 @@ class DirectoryHandler
         name = file.getBaseName()
         [rootProjectPath, relativeDirectoryPath] = atom.project.relativizePath(file.path)
 
-        if (@childTemplates)
+        if (@childTemplates && @childTemplates[name])
           # this is template directory so create a new directory handler
-          new DirectoryHandler(name, container, relativeDirectoryPath, @childTemplates[name], @childTemplates)
+          console.log("Init: " + name)
+          new DirectoryHandler(name, container, relativeDirectoryPath, @childTemplates[name].file, @childTemplates, @childTemplates[name].callback, @childTemplates[name].options)
         else
           new DirectoryHandler(name, container, relativeDirectoryPath)
 
@@ -78,9 +82,12 @@ class DirectoryHandler
     dialog = new AddDialog(path,
       DirectoryHandler.resolvePath("/templates/$lang/parts"),
       DirectoryHandler.resolvePath(template + ".$lang"),
-      name.toLowerCase())
+      name.toLowerCase()
+      @dialogOptions)
 
     dialog.on "module-created", @callback
+    #dialog.on "module-created", @load
+
     dialog.attach()
 
     return false
@@ -99,19 +106,29 @@ class DirectoryHandler
   @checkCreateFile: (file, template) ->
     findFile = DirectoryHandler.resolvePath(file, true)
     unless fs.existsSync findFile
-      templateFile = DirectoryHandler.resolvePath(template, true)
+      template = DirectoryHandler.resolveName(template)
+
+      dir = fsPath.dirname(template)
+      file = fsPath.basename(template)
+
+      templateFile = atom.packages.resolvePackagePath("mantrajs/" + dir)
+      templateFile += "/" + file;
 
       [rootProjectPath, relativePath] = atom.project.relativizePath(findFile)
 
       fs.copySync templateFile, findFile
       atom.notifications.addInfo "Mantra file created: " + relativePath
 
-  @resolvePath: (path, absolute, addRoot) ->
+  @resolveName: (path) ->
     lang = "js";
     if (atom.config.get('mantrajs.language') == "Typescript")
       lang = "ts"
 
-    path = path.replace(/\$lang/g, lang)
+    return path.replace(/\$lang/g, lang)
+  @resolvePath: (path, absolute, addRoot) ->
+
+
+    path = DirectoryHandler.resolveName(path)
 
     if (addRoot)
       path = Config.get("root") + path
