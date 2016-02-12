@@ -9,7 +9,8 @@
 'menu': [
   {
     'label': 'Packages'
-qweqwe      'label': 'Mantra JS'
+    'submenu': [
+      'label': 'Mantra JS'
       'submenu': [
         {
           'label': 'Toggle'

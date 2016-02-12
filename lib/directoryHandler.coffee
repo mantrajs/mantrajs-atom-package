@@ -75,9 +75,7 @@ class DirectoryHandler
 
     AddDialog ?= require './add-module-dialog'
 
-    lang = "js";
-    if (atom.config.get('mantrajs.language') == "Typescript")
-      lang = "ts"
+    lang = Config.get("language");
 
     dialog = new AddDialog(path,
       DirectoryHandler.resolvePath("/templates/$lang/parts"),
@@ -120,9 +118,7 @@ class DirectoryHandler
       atom.notifications.addInfo "Mantra file created: " + relativePath
 
   @resolveName: (path) ->
-    lang = "js";
-    if (atom.config.get('mantrajs.language') == "Typescript")
-      lang = "ts"
+    lang = Config.get("language");
 
     return path.replace(/\$lang/g, lang)
   @resolvePath: (path, absolute, addRoot) ->
