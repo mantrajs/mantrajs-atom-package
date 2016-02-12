@@ -1,9 +1,13 @@
 {
   "name": "mantrajs",
   "main": "./lib/mantrajs",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Mantra JS extensions for Meteor app development",
-  "keywords": [ "meteor", "mantra", "meteorjs", "mantrajs"
+  "keywords": [
+    "meteor",
+    "mantra",
+    "meteorjs",
+    "mantrajs"
   ],
   "activationCommands": {
     "atom-workspace": "mantrajs:toggle"
