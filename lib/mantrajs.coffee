@@ -72,7 +72,7 @@ module.exports = TreeViewGitModified =
     @isVisible = !@isVisible
 
   show: ->
-    atom.notifications.addWarning("I must warn you, this is only alpha!");
+    atom.notifications.addWarning("I must warn you, this is only alpha!")
 
     @mantraTreeView.show()
     @isVisible = true
@@ -82,14 +82,14 @@ module.exports = TreeViewGitModified =
     @isVisible = false
 
   init: ->
-    pathFrom = atom.packages.resolvePackagePath("mantrajs/templates/app/client");
-    pathTo =  atom.project.resolvePath("client");
+    pathFrom = atom.packages.resolvePackagePath("mantrajs/templates/app/client")
+    pathTo =  atom.project.resolvePath("client")
     fs.copySync(pathFrom, pathTo)
 
-    pathFrom = atom.packages.resolvePackagePath("mantrajs/templates/app/server");
-    pathTo =  atom.project.resolvePath("server");
+    pathFrom = atom.packages.resolvePackagePath("mantrajs/templates/app/server")
+    pathTo =  atom.project.resolvePath("server")
     fs.copySync(pathFrom, pathTo)
 
-    pathFrom = atom.packages.resolvePackagePath("mantrajs/templates/app/lib");
-    pathTo =  atom.project.resolvePath("lib");
+    pathFrom = atom.packages.resolvePackagePath("mantrajs/templates/app/lib")
+    pathTo =  atom.project.resolvePath("lib")
     fs.copySync(pathFrom, pathTo)

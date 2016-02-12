@@ -32,7 +32,7 @@ class ModuleHandler
 
     dir = atom.project.resolvePath(@path)
     unless atom.project.contains(dir)
-      atom.notifications.addWarning("This is not a Mantra project, " + @path + " directory missing!");
+      atom.notifications.addWarning("This is not a Mantra project, " + @path + " directory missing!")
 
     @moduleDir = atom.project.getDirectories()[0].getSubdirectory(@path)
     @moduleDir.onDidChange(() -> self.load())
@@ -53,7 +53,7 @@ class ModuleHandler
     # $(@container).on 'click', '.list-item[is=tree-view-file]', ->
     #   atom.workspace.open(this.file.path)
 
-    @moduleList.onchange();
+    @moduleList.onchange()
 
   createModule: ->
     path = DirectoryHandler.resolvePath("client/modules", true, true)
@@ -65,12 +65,12 @@ class ModuleHandler
 
     dialog.on "module-created", (event, newPath) ->
       dialog.load()
-      
+
       # find the name of the new module
       name = fspath.basename(newPath)
 
       # modify main.js
-      mainFile = DirectoryHandler.resolvePath("client/main.$lang", true, true);
+      mainFile = DirectoryHandler.resolvePath("client/main.$lang", true, true)
 
       DirectoryHandler.replaceInFile(mainFile, [
           "import {createApp} from 'mantra-core';", "import {createApp} from 'mantra-core';\nimport " + name  + "Module from \"./modules/" + name + "\";",
@@ -88,7 +88,7 @@ class ModuleHandler
     unless sel.selectedOptions[0]
       return
 
-    selectedPath = sel.selectedOptions[0].file.path;
+    selectedPath = sel.selectedOptions[0].file.path
 
     [rootProjectPath, relativeDirectoryPath] = atom.project.relativizePath(selectedPath)
 
@@ -111,7 +111,7 @@ class ModuleHandler
 
   clear: (elem) ->
     while (elem.firstChild)
-      elem.removeChild(elem.firstChild);
+      elem.removeChild(elem.firstChild)
 
   @addModule: (parent, file) ->
     listItem = document.createElement('option')

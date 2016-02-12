@@ -19,9 +19,9 @@ class DirectoryHandler
     @dialogOptions = dialogOptions
 
     # check and create directory
-    DirectoryHandler.checkCreateDirectory(path);
+    DirectoryHandler.checkCreateDirectory(path)
 
-    func = null;
+    func = null
     if (template)
       func = @create.bind(this, template, name, path)
 
@@ -29,7 +29,7 @@ class DirectoryHandler
 
     dir = atom.project.resolvePath(path)
     unless fs.existsSync(dir)
-      atom.notifications.addWarning("This is not a Mantra project, " + path + " directory missing!");
+      atom.notifications.addWarning("This is not a Mantra project, " + path + " directory missing!")
 
     @methodDir = atom.project.getDirectories()[0].getSubdirectory(path)
     @methodDir.onDidChange(() ->
@@ -75,7 +75,7 @@ class DirectoryHandler
 
     AddDialog ?= require './add-module-dialog'
 
-    lang = Config.get("language");
+    lang = Config.get("language")
 
     dialog = new AddDialog(path,
       DirectoryHandler.resolvePath("/templates/$lang/parts"),
@@ -92,7 +92,7 @@ class DirectoryHandler
 
   clear: (elem) ->
     while (elem.firstChild)
-      elem.removeChild(elem.firstChild);
+      elem.removeChild(elem.firstChild)
 
   @checkCreateDirectory: (dir) ->
     dirPath = DirectoryHandler.resolvePath(dir, true)
@@ -110,7 +110,7 @@ class DirectoryHandler
       file = fsPath.basename(template)
 
       templateFile = atom.packages.resolvePackagePath("mantrajs/" + dir)
-      templateFile += "/" + file;
+      templateFile += "/" + file
 
       [rootProjectPath, relativePath] = atom.project.relativizePath(findFile)
 
@@ -118,7 +118,7 @@ class DirectoryHandler
       atom.notifications.addInfo "Mantra file created: " + relativePath
 
   @resolveName: (path) ->
-    lang = Config.get("language");
+    lang = Config.get("language")
 
     return path.replace(/\$lang/g, lang)
   @resolvePath: (path, absolute, addRoot) ->
@@ -147,16 +147,16 @@ class DirectoryHandler
   @replaceInFile: (path, replacements) ->
     fs.readFile(path, 'utf8', (err, data) ->
       if err
-        return console.log(err);
+        return console.log(err)
 
       for i in [0...replacements.length/2]
-        data = data.replace(replacements[i*2], replacements[i*2+1]);
+        data = data.replace(replacements[i*2], replacements[i*2+1])
 
       fs.writeFile(path, data, 'utf8', (err) ->
-         if err
-           return console.log(err);
-      );
-    );
+        if err
+          return console.log(err)
+      )
+    )
 
   @addFile: (parent, file) ->
     listItem = document.createElement('li')
@@ -174,7 +174,7 @@ class DirectoryHandler
 
   @createList: (headerText, parent, func) ->
 
-    client = document.createElement('li');
+    client = document.createElement('li')
 
     # header
 
