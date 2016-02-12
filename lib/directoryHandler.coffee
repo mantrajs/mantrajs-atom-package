@@ -118,9 +118,10 @@ class DirectoryHandler
       atom.notifications.addInfo "Mantra file created: " + relativePath
 
   @resolveName: (path) ->
-    lang = Config.get("language");
-
-    return path.replace(/\$lang/g, lang)
+    if (path.indexOf("$lang") >= 0)
+      lang = Config.get("language");
+      return path.replace(/\$lang/g, lang)
+    return path
   @resolvePath: (path, absolute, addRoot) ->
 
 
