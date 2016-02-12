@@ -8,7 +8,7 @@
   "activationCommands": {
     "atom-workspace": "mantrajs:toggle"
   },
-  "repository": "https://github.com/atom/mantrajs",
+  "repository": "https://github.com/tomitrescak/mantrajs-atom-package",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
