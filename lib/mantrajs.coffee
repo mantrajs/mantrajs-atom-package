@@ -2,6 +2,7 @@
 {requirePackages} = require 'atom-utils'
 TreeViewGitModifiedView = require './mantra-view'
 fs = require("fs-extra")
+Config = require './configHandler'
 
 module.exports = TreeViewGitModified =
   config:
@@ -72,6 +73,7 @@ module.exports = TreeViewGitModified =
     @isVisible = !@isVisible
 
   show: ->
+    Config.options = null # erase options
     atom.notifications.addWarning("I must warn you, this is only alpha!")
 
     @mantraTreeView.show()

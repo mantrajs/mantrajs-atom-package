@@ -38,7 +38,7 @@ class TreeViewGitModifiedView
   loadDirectories: ->
     self = this
 
-    DirectoryHandler.checkCreateFile("mantra.json", "templates/mantra.json")
+    # DirectoryHandler.checkCreateFile("mantra.json", "templates/mantra.json")
 
     # dir = DirectoryHandler.resolvePath("client/modules", true, true)
     # unless fs.existsSync(dir)
@@ -100,6 +100,8 @@ class TreeViewGitModifiedView
 
   # Append pane before the tree view
   show: ->
+    Config.options = null # erase options
+    
     @loadDirectories()
 
     requirePackages('tree-view').then ([treeView]) =>
