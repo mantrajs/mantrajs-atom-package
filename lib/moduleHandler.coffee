@@ -75,7 +75,7 @@ class ModuleHandler
       mainFile = DirectoryHandler.resolvePath("client/main.$lang", true, true)
 
       DirectoryHandler.replaceInFile(mainFile, [
-          "import {createApp} from 'mantra-core';", "import {createApp} from 'mantra-core';\nimport " + name  + "Module from \"./modules/" + name + "\";",
+          /(import \{createApp\} from ['"]mantra-core['"];)/, "$1\nimport " + name  + "Module from \"./modules/" + name + "\";",
           "app.init();", "app.loadModule(" + name + "Module);\napp.init();"
       ])
 
