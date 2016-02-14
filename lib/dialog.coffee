@@ -8,7 +8,9 @@ class Dialog extends View
   @content: ({prompt, options, templateText} = {}) ->
     @div class: 'tree-view-dialog', =>
       @label prompt, class: 'icon', outlet: 'promptText'
-      @subview 'miniEditor', new TextEditorView(mini: true)
+      view = new TextEditorView(mini: true)
+      view.element.setAttribute("tabindex", 1)
+      @subview 'miniEditor', view
 
       if options
         optionTexts = []
@@ -32,6 +34,7 @@ class Dialog extends View
           @div class: ''
           @label options[i], class: 'icon'
           view = new TextEditorView(mini: true)
+          view.element.setAttribute("tabindex", i + 2)
           @subview 'option_' + i, view
 
           view.on 'keyup', changeText.bind(this, view, i, optionTexts, templateText, -> self.getLabel())

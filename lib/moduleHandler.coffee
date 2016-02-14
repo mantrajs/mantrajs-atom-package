@@ -16,14 +16,16 @@ class ModuleHandler
     label.innerText = "Module "
     parent.appendChild(label)
 
+    # add button to add a module
+    @appendButton(parent, "+", @createModule)
+
     # add combobox with all modules
     @moduleList = document.createElement('select')
-    @moduleList.classList.add('list-item')
+    @moduleList.classList.add('form-control')
+    @moduleList.classList.add('tomi')
     @moduleList.onchange = @loadModule.bind(this)
     parent.appendChild(@moduleList)
 
-    # add button to add a module
-    @appendButton(parent, "+", @createModule)
 
     # add top level element in which we display the selected modules
     @container = document.createElement('ol')

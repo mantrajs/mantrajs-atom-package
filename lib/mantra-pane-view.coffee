@@ -45,7 +45,7 @@ class TreeViewOpenFilesPaneView
     # load modules
 
     moduleFields = document.createElement('div')
-    moduleFields.classList.add('mantra', 'pane')
+    moduleFields.classList.add('mantra', 'atom-pane')
     @element.appendChild(moduleFields)
 
     DirectoryHandler.checkCreateDirectory(Config.get("root") + "client/configs")
@@ -60,7 +60,7 @@ class TreeViewOpenFilesPaneView
     # add server methods
 
     serverFields = document.createElement('div')
-    serverFields.classList.add('mantra', 'pane')
+    serverFields.classList.add('mantra', 'atom-pane')
     @element.appendChild(serverFields)
 
     # add main server file

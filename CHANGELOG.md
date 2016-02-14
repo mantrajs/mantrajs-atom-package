@@ -1,3 +1,6 @@
+## 0.1.4
+* Improved visual components
+
 ## 0.1.1 - First Release
 * Improved README
 
