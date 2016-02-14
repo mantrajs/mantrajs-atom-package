@@ -1,7 +1,7 @@
 {
   "name": "mantrajs",
   "main": "./lib/mantrajs",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Mantra JS extensions for Meteor app development",
   "keywords": [
     "meteor",
