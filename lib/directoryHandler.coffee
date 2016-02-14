@@ -201,7 +201,7 @@ class DirectoryHandler
         button.classList.add('pull-right', 'mantra', 'addButton')
 
         buttonSpan = document.createElement('div')
-        buttonSpan.innerText = "+"
+        buttonSpan.innerText = "NEW"
         buttonSpan.classList.add('mantra', 'addText')
 
         button.appendChild(buttonSpan)

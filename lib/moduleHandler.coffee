@@ -17,7 +17,7 @@ class ModuleHandler
     parent.appendChild(label)
 
     # add button to add a module
-    @appendButton(parent, "+", @createModule)
+    @appendButton(parent, "NEW", @createModule)
 
     # add combobox with all modules
     @moduleList = document.createElement('select')
