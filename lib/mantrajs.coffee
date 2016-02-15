@@ -1,6 +1,6 @@
 {CompositeDisposable} = require 'atom'
 {requirePackages} = require 'atom-utils'
-TreeViewGitModifiedView = require './mantra-view'
+MantraView = require './mantra-view'
 fs = require("fs-extra")
 Config = require './configHandler'
 
@@ -24,7 +24,7 @@ module.exports = TreeViewGitModified =
   isVisible: false
 
   activate: (state) ->
-    @mantraTreeView = new TreeViewGitModifiedView(state.mantraTreeViewState)
+    @mantraTreeView = new MantraView(state.mantraTreeViewState)
     @isVisible = state.isVisible
 
     # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
@@ -41,7 +41,7 @@ module.exports = TreeViewGitModified =
 
     requirePackages('tree-view').then ([treeView]) =>
       if (!@mantraTreeView)
-        @mantraTreeView = new TreeViewGitModifiedView
+        @mantraTreeView = new MantraView
 
       if (treeView.treeView && @isVisible) or (@isVisible is undefined)
         @mantraTreeView.show()

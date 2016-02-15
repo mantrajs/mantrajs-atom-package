@@ -6,12 +6,14 @@ path = require 'path'
 Config = require('./configHandler')
 DirectoryHandler = require('./directoryHandler')
 
-TreeViewGitModifiedPaneView = require './mantra-pane-view'
+MantraPaneView = require './mantra-pane-view'
 
 AddDialog = null  # Defer requiring until actually needed
 
 module.exports =
-class TreeViewGitModifiedView
+class MantraView
+
+  @treeView = null
 
   constructor: (serializedState) ->
 
@@ -57,7 +59,7 @@ class TreeViewGitModifiedView
 
         #      tree.show()
         #else
-      @mantraPaneView = new TreeViewGitModifiedPaneView repo
+      @mantraPaneView = new MantraPaneView repo
       #mantraPaneView.setRepo repo
       self.mantraPanes.push mantraPaneView
       self.element.appendChild mantraPaneView.element
@@ -101,7 +103,7 @@ class TreeViewGitModifiedView
   # Append pane before the tree view
   show: ->
     Config.options = null # erase options
-    
+
     @loadDirectories()
 
     requirePackages('tree-view').then ([treeView]) =>
@@ -110,3 +112,5 @@ class TreeViewGitModifiedView
       @parentElement = @treeView.element.querySelector('.tree-view-scroller .tree-view')
 
       @parentElement.insertBefore(@element, @parentElement.firstChild)
+
+      MantraView.treeView = @treeView.element

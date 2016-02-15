@@ -1,3 +1,5 @@
+import { IContext } from "../../../configs/context";
+
 export default {
   create({Meteor, LocalState}, myParam: string) {
     // e.g. update local state

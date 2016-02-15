@@ -2,12 +2,13 @@
 fs = require("fs-extra")
 fsPath = require("path")
 Config = require("./configHandler")
-
+{requirePackages} = require 'atom-utils'
 AddDialog = null
 
 module.exports =
 class DirectoryHandler
   @selectedElement: null
+  @treeElement: null
 
   constructor: (name, parent, path, template, childTemplates, callback, dialogOptions) ->
     self = this
@@ -38,18 +39,61 @@ class DirectoryHandler
 
     @load()
 
+    # init treeView
+    DirectoryHandler.treeView()
+
   load: () ->
     @clear(@container)
     @loadDirectory(@methodDir, @container)
 
     $(@container).on 'click', '.list-item[is=tree-view-file]', (e) ->
+      DirectoryHandler.revealActiveFile(e)
+
       atom.workspace.open(this.file.path)
       this.getPath = () -> return this.file.path # TODO: Check other options
       DirectoryHandler.select(this)
 
     $(@container).on 'contextmenu', '.list-item[is=tree-view-file]', (e) ->
-      e.stopPropagation()
-      e.preventDefault()
+      atom.workspace.open(this.file.path)
+      DirectoryHandler.select(this)
+      DirectoryHandler.revealActiveFile(e)
+
+      #e.stopPropagation()
+      #e.preventDefault()
+
+  @treeView: () ->
+    if (DirectoryHandler.treeElement == null)
+      requirePackages('tree-view').then ([treeView]) =>
+        DirectoryHandler.treeElement = treeView.treeView.element
+    return DirectoryHandler.treeElement
+
+  @revealActiveFile: (e) ->
+    activeFilePath = e.currentTarget.file.path
+
+    [rootPath, relativePath] = atom.project.relativizePath(activeFilePath)
+    return unless rootPath?
+
+    activePathComponents = relativePath.split(fsPath.sep)
+    currentPath = rootPath
+
+    for pathComponent in activePathComponents
+      currentPath += fsPath.sep + pathComponent
+      entry = DirectoryHandler.entryForPath(currentPath)
+      if entry.expand
+        entry.expand()
+
+  @entryForPath: (entryPath) ->
+    bestMatchEntry = null
+    bestMatchLength = 0
+
+    for entry in DirectoryHandler.treeView().querySelectorAll('.entry')
+      if entry.isPathEqual(entryPath)
+        return entry
+
+      entryLength = entry.getPath().length
+      if entry.directory?.contains(entryPath) and entryLength > bestMatchLength
+        bestMatchEntry = entry
+        bestMatchLength = entryLength
 
   loadDirectory: (dir, container) ->
     files = dir.getEntriesSync()

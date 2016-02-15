@@ -11,7 +11,7 @@ Config = require('./configHandler')
 AddDialog = null  # Defer requiring until actually needed
 
 module.exports =
-class TreeViewOpenFilesPaneView
+class MantraPaneView
 
   constructor: (repo) ->
     self = this

@@ -1,7 +1,6 @@
 import React from "react";
 
 interface IProps {
-
 }
 
 class $1 extends React.Component<IProps, {}> {
