@@ -109,7 +109,7 @@ class DirectoryHandler
 
         if (@childTemplates && @childTemplates[name])
           # this is template directory so create a new directory handler
-          console.log("Init: " + name)
+          console.log("Init: " + name + " : " + @childTemplates[name].callback)
           new DirectoryHandler(name, container, relativeDirectoryPath, @childTemplates[name].file, @childTemplates, @childTemplates[name].callback, @childTemplates[name].options)
         else
           new DirectoryHandler(name, container, relativeDirectoryPath)
@@ -204,6 +204,7 @@ class DirectoryHandler
     )
 
   @addFile: (parent, file) ->
+    name = fsPath.basename(file.path)
     listItem = document.createElement('li')
     listItem.classList.add('file', 'list-item')
     listItem.setAttribute('is', 'tree-view-file')
@@ -211,8 +212,8 @@ class DirectoryHandler
     listItemName = document.createElement('span')
     listItemName.innerText = file.getBaseName()
     listItemName.classList.add('name', 'icon', 'icon-file-text')
-    listItemName.setAttribute('data-path', file)
-    listItemName.setAttribute('data-name', file)
+    listItemName.setAttribute('data-path', file.path)
+    listItemName.setAttribute('data-name', name)
     listItem.appendChild listItemName
 
     parent.appendChild listItem

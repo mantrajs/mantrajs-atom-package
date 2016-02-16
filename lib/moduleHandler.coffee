@@ -1,5 +1,7 @@
 {$} = require 'space-pen'
 DirectoryHandler = require('./directoryHandler')
+Config = require('./configHandler')
+
 fspath = require 'path'
 
 AddDialog = null
@@ -63,7 +65,8 @@ class ModuleHandler
     AddDialog ?= require './add-module-dialog'
     dialog = new AddDialog(path,
       DirectoryHandler.resolvePath("/templates/$lang/parts/module"),
-      null, "module")
+      null,
+      "module")
 
     dialog.on "module-created", (event, newPath) ->
       dialog.load()
@@ -99,9 +102,11 @@ class ModuleHandler
     #new DirectoryHandler("Configs", @container, relativeDirectoryPath + "/configs")
     #new DirectoryHandler("Containers", @container, relativeDirectoryPath + "/containers", "container.js")
 
+    self = this
     new DirectoryHandler(null, @container, relativeDirectoryPath, null, {
       "actions":
-        "file": "action"
+        "file": "action",
+        "callback": (e, newPath) -> self.updateAction(e, newPath)
       "components":
         "file": "component"
         "options": ["Class Name"]
@@ -110,6 +115,18 @@ class ModuleHandler
         "options": ["Component Name", "Parameters", "Subscription", "Collection"]
     })
 
+  updateAction: (e, newPath) ->
+    # modify main.js
+    name = fspath.basename(newPath, ".js")
+    name = fspath.basename(name, ".ts")
+
+    dir = fspath.dirname(newPath)
+    indexFile = fspath.join(dir, "index." + Config.get("language"))
+
+    DirectoryHandler.replaceInFile(indexFile, [
+        "const actions = {", "import " + name  + " from \"./" + name + "\";\nconst actions = {",
+        "const actions = {", "const actions = {\n\t" + name + "();"
+    ])
 
   clear: (elem) ->
     while (elem.firstChild)

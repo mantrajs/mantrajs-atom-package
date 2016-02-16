@@ -1,14 +1,15 @@
 fs = require 'fs'
+cson = require('CSON')
 
 module.exports =
 class ConfigHandler
   @options: null
   @get: (key) ->
     if ConfigHandler.options == null
-      configPath = atom.project.resolvePath("mantra.json")
+      configPath = atom.project.resolvePath("mantra.cson")
       try
         fs.accessSync configPath, fs.F_OK
-        ConfigHandler.options = require(configPath)
+        ConfigHandler.options = cson.parseCSONFile(configPath)
       catch e
         console.log e
 

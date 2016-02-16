@@ -1,8 +1,6 @@
 //import {Meteor} from 'meteor/meteor';
 //import {check} from 'meteor/check';
 
-// import {Posts, Comments} from '/lib/collections';
-
 export default function () {
   Meteor.publish("$1", function () {
     const selector = {};

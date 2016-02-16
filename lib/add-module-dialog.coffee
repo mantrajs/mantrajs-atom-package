@@ -3,6 +3,7 @@ fs = require 'fs-extra'
 fso = require 'fs'
 Dialog = require './dialog'
 DirectoryHandler = require './directoryHandler'
+Config = require './configHandler'
 
 module.exports =
 class AddDialog extends Dialog
@@ -15,14 +16,27 @@ class AddDialog extends Dialog
 
     @templatePath = templatePath
     @fileName = fileName
+    @title = title
+
+    if (@fileName)
+      @baseName = path.basename(@fileName, ".ts")
+      @baseName = path.basename(@baseName, ".js")
+      title = @baseName
 
     relativeDirectoryPath = directoryPath
     [@rootProjectPath, relativeDirectoryPath] = atom.project.relativizePath(directoryPath)
     relativeDirectoryPath += path.sep if relativeDirectoryPath.length > 0
 
     if templatePath && fileName
-      tp = atom.packages.resolvePackagePath("mantrajs/" + templatePath) + "/" + fileName
-      templateText = fso.readFileSync(tp, 'utf8')
+      customTemplate = @getCustomTemplate(@baseName)
+
+      if customTemplate
+        templateText = customTemplate.content
+        options = customTemplate.placeHolders
+        console.log("Init from custom template ...")
+      else
+        tp = atom.packages.resolvePackagePath("mantrajs/" + templatePath) + "/" + fileName
+        templateText = fso.readFileSync(tp, 'utf8')
 
     super
       prompt: "Enter the name of the new " + title
@@ -63,9 +77,31 @@ class AddDialog extends Dialog
           fs.writeFileSync(newPath, @templateView.text())
           #fromPath += "/" + @fileName
         else
-          fs.copySync(fromPath, newPath)
+          customTemplate = @getCustomTemplate('module')
+          if @title == 'module' && customTemplate
+            @createModuleFromConfig(newPath, customTemplate)
+          else
+            fs.copySync(fromPath, newPath)
 
         @trigger 'module-created', [newPath]
         @cancel()
     catch error
       @showError("#{error.message}.")
+
+  getCustomTemplate: (name) ->
+    cf = Config.get('templates')
+    lang = Config.get('language')
+    if cf && cf[lang] && cf[lang][name]
+      return cf[lang][name]
+    return null
+
+  createModuleFromConfig: (newPath, template) ->
+    for directory in template
+      p = path.join(newPath, directory.path)
+      fs.ensureDirSync(p)
+
+      if directory.files && directory.files.length
+        for file in directory.files
+          pf = path.join(p, file.name)
+          fs.outputFile(pf, file.content)
+          console.log "Created custom: " + pf
