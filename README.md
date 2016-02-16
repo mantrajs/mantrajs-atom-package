@@ -71,6 +71,8 @@ Plugin can be configured on two levels:
 
 If you adopt a naming standard, (e.g. when all actions have suffix `_action.ts`) you can use the awesome [file-icons](https://atom.io/packages/file-icons) package to bring some colors into your Mantra application as portrayed below.
 
+<img width="362" alt="screen shot 2016-02-16 at 22 26 56" src="https://cloud.githubusercontent.com/assets/2682705/13075377/dbf794fa-d4fe-11e5-893a-0e454b9b4c36.png">
+
 This is an exemplary configuration from your user styles.
 
 ```less
