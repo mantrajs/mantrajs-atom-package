@@ -5,6 +5,8 @@
 1. Install plugin in Atom
 2. Start the plugin with "ctrl+alt+o"
 
+**IMPORTANT:** Currently works only with the default theme (e.g. Material design theme not supported) 
+
 ## Functionality:
 
 - custom pane to display Mantra modules and components
