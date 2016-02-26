@@ -1,5 +1,5 @@
 fs = require 'fs'
-cson = require('CSON')
+cson = require('cson')
 
 module.exports =
 class ConfigHandler
