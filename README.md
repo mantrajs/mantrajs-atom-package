@@ -5,6 +5,8 @@
 1. Install plugin in Atom
 2. Start the plugin with "ctrl+alt+o"
 
+**IMPORTANT:** Currently works only with the default theme (e.g. Material design theme not supported) 
+
 ## Functionality:
 
 - custom pane to display Mantra modules and components
@@ -71,6 +73,8 @@ Plugin can be configured on two levels:
 
 If you adopt a naming standard, (e.g. when all actions have suffix `_action.ts`) you can use the awesome [file-icons](https://atom.io/packages/file-icons) package to bring some colors into your Mantra application as portrayed below.
 
+<img width="362" alt="screen shot 2016-02-16 at 22 26 56" src="https://cloud.githubusercontent.com/assets/2682705/13075377/dbf794fa-d4fe-11e5-893a-0e454b9b4c36.png">
+
 This is an exemplary configuration from your user styles.
 
 ```less
@@ -87,15 +91,21 @@ This is an exemplary configuration from your user styles.
 
 @{pane-tab-selector}, .icon-file-text {
   &[data-name$="container.ts"]           { .medium-red;             } // Colours icon and filename
-  &[data-name$="container.ts"]:before   { .container-icon; .medium-red; } // Colours icon only
-  &[data-name$="action.ts"]   { .medium-blue; } // Colours icon only
-  &[data-name$="action.ts"]:before   { .action-icon; .medium-blue; } // Colours icon only
+  &[data-name$="container.ts"]:before   { .container-icon!important; .medium-red!important; } // Colours icon only
+  &[data-name$="actions.ts"]   { .medium-blue; } // Colours icon only
+  &[data-name$="actions.ts"]:before   { .action-icon!important; .medium-blue!important; } // Colours icon only
   &[data-name$="view.tsx"]   { .medium-green; } // Colours icon only
-  &[data-name$="view.tsx"]:before   { .component-icon; .medium-green; } // Colours icon only
-  &[data-name$="publications.ts"]:before   { .publications-icon; } // Colours icon only
-  &[data-name$="collection.ts"]:before   { .collection-icon; } // Colours icon only
+  &[data-name$="view.tsx"]:before   { .component-icon!important; .medium-green!important; } // Colours icon only
+
+  &[data-name$="layout.tsx"]   { .medium-green; } // Colours icon only
+  &[data-name$="layout.tsx"]:before   { .component-icon!important; .medium-green!important; } // Colours icon only
+
+  &[data-name$="publications.ts"]:before   { .publications-icon!important; } // Colours icon only
+  &[data-name$="collection.ts"]:before   { .collection-icon!important; } // Colours icon only
   &[data-name$="routes.tsx"]           { .medium-yellow;             } // Colours icon and filename
-  &[data-name$="routes.tsx"]:before   { .routes-icon; .medium-yellow; } // Colours icon only
+  &[data-name$="routes.tsx"]:before   { .routes-icon!important; .medium-yellow!important; } // Colours icon only
+}
+
 }
 ```
 
