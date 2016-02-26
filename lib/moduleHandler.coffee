@@ -125,7 +125,7 @@ class ModuleHandler
 
     DirectoryHandler.replaceInFile(indexFile, [
         "const actions = {", "import " + name  + " from \"./" + name + "\";\nconst actions = {",
-        "const actions = {", "const actions = {\n\t" + name + "();"
+        "const actions = {", "const actions = {\n  " + name + ","
     ])
 
   clear: (elem) ->
