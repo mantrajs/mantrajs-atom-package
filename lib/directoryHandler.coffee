@@ -48,10 +48,13 @@ class DirectoryHandler
 
     $(@container).on 'click', '.list-item[is=tree-view-file]', (e) ->
       DirectoryHandler.revealActiveFile(e)
+      e.stopPropagation();
 
       atom.workspace.open(this.file.path)
       this.getPath = () -> return this.file.path # TODO: Check other options
       DirectoryHandler.select(this)
+
+      return false
 
     $(@container).on 'contextmenu', '.list-item[is=tree-view-file]', (e) ->
       atom.workspace.open(this.file.path)

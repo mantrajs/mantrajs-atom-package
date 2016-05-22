@@ -51,7 +51,7 @@ class MantraPaneView
     DirectoryHandler.checkCreateDirectory(Config.get("root") + "client/configs")
     DirectoryHandler.checkCreateFile(Config.get("root") + "client/configs/context.$lang", "templates/$lang/app/client/configs/context.$lang")
 
-    DirectoryHandler.checkCreateFile(Config.get("root") + "client/main.$lang", "templates/$lang/app/client/main.$lang")
+    # DirectoryHandler.checkCreateFile(Config.get("root") + "client/main.$lang", "templates/$lang/app/client/main.$lang")
 
     # check create module directory
     DirectoryHandler.checkCreateDirectory(Config.get("root") + "client/modules")
@@ -64,43 +64,43 @@ class MantraPaneView
     @element.appendChild(serverFields)
 
     # add main server file
-    DirectoryHandler.checkCreateDirectory(Config.get("root") + "server/methods")
-    DirectoryHandler.checkCreateFile(Config.get("root") + "server/main.$lang", "templates/$lang/app/server/main.$lang")
-    DirectoryHandler.checkCreateFile(Config.get("root") + "server/methods/index.$lang", "templates/$lang/app/server/methods/index.$lang")
-    DirectoryHandler.checkCreateDirectory(Config.get("root") + "server/publications")
-    DirectoryHandler.checkCreateFile(Config.get("root") + "server/publications/index.$lang", "templates/$lang/app/server/publications/index.$lang")
+    # DirectoryHandler.checkCreateDirectory(Config.get("root") + "server/methods")
+    # DirectoryHandler.checkCreateFile(Config.get("root") + "server/main.$lang", "templates/$lang/app/server/main.$lang")
+    # DirectoryHandler.checkCreateFile(Config.get("root") + "server/methods/index.$lang", "templates/$lang/app/server/methods/index.$lang")
+    # DirectoryHandler.checkCreateDirectory(Config.get("root") + "server/publications")
+    # DirectoryHandler.checkCreateFile(Config.get("root") + "server/publications/index.$lang", "templates/$lang/app/server/publications/index.$lang")
 
-    new DirectoryHandler("methods", serverFields, Config.get("root") + "server/methods", "method", null, (event, newPath) ->
-      # find the name of the new module
-      name = fspath.basename(newPath, ".js")
-      name = fspath.basename(name, ".ts")
-
-      # modify main.js
-      mainFile = DirectoryHandler.resolvePath("server/methods/index.$lang", true, true)
-
-      DirectoryHandler.replaceInFile(mainFile, [
-          "export default function () {", "import " + name + " from \"./" + name + "\";\nexport default function () {",
-          "export default function () {", "export default function () {\n    " + name + "();"
-      ])
-    , ["Method Name", "Parameter Name"]
-    )
+    # new DirectoryHandler("methods", serverFields, Config.get("root") + "server/methods", "method", null, (event, newPath) ->
+    #   # find the name of the new module
+    #   name = fspath.basename(newPath, ".js")
+    #   name = fspath.basename(name, ".ts")
+    #
+    #   # modify main.js
+    #   mainFile = DirectoryHandler.resolvePath("server/methods/index.$lang", true, true)
+    #
+    #   DirectoryHandler.replaceInFile(mainFile, [
+    #       "export default function () {", "import " + name + " from \"./" + name + "\";\nexport default function () {",
+    #       "export default function () {", "export default function () {\n    " + name + "();"
+    #   ])
+    # , ["Method Name", "Parameter Name"]
+    # )
 
     # add publications
 
-    new DirectoryHandler("publications", serverFields, Config.get("root") + "server/publications", "publication", null, (event, newPath) ->
-      # find the name of the new module
-      name = fspath.basename(newPath, ".js")
-      name = fspath.basename(name, ".ts")
-
-      # modify main.js
-      mainFile = DirectoryHandler.resolvePath("server/publications/index.$lang", true, true)
-
-      DirectoryHandler.replaceInFile(mainFile, [
-          "export default function () {", "import " + name + " from \"./" + name + "\";\nexport default function () {",
-          "export default function () {", "export default function () {\n    " + name + "();"
-      ])
-    , ["Publication Name", "Collection Name"]
-    )
+    # new DirectoryHandler("publications", serverFields, Config.get("root") + "server/publications", "publication", null, (event, newPath) ->
+    #   # find the name of the new module
+    #   name = fspath.basename(newPath, ".js")
+    #   name = fspath.basename(name, ".ts")
+    #
+    #   # modify main.js
+    #   mainFile = DirectoryHandler.resolvePath("server/publications/index.$lang", true, true)
+    #
+    #   DirectoryHandler.replaceInFile(mainFile, [
+    #       "export default function () {", "import " + name + " from \"./" + name + "\";\nexport default function () {",
+    #       "export default function () {", "export default function () {\n    " + name + "();"
+    #   ])
+    # , ["Publication Name", "Collection Name"]
+    # )
 
     # add lib directory
     new DirectoryHandler("library", serverFields, Config.get("root") + Config.get("libFolderName"))

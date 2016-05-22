@@ -18,13 +18,14 @@
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
+    "atom-space-pen-views": "^1.0.0",
     "atom-utils": ">=0.6.3",
+    "cson": "^3.0.0",
     "event-kit": "^0.8.0",
-    "lodash": "^2.4.1",
-    "space-pen": "^3.8.0",
     "fs-extra": "^0.26.0",
     "fs-plus": "^2.8.1",
-    "atom-space-pen-views": "^1.0.0",
-    "cson": "^3.0.0"
+    "lodash": "^2.4.1",
+    "space-pen": "^3.8.0",
+    "yamljs": "^0.2.7"
   }
 }

@@ -9,6 +9,7 @@ DirectoryHandler = require('./directoryHandler')
 MantraPaneView = require './mantra-pane-view'
 
 AddDialog = null  # Defer requiring until actually needed
+showing = false
 
 module.exports =
 class MantraView
@@ -51,7 +52,13 @@ class MantraView
     for tree in @mantraPanes
       tree.hide()
 
+    self.mantraPanes = []
     atom.project.getDirectories().map (repo) ->
+
+      if self.mantraPanes.length
+        atom.notifications.addInfo "Ignoring " + repo.path
+        return
+
       #for repo in repos
         #if repo.repo == null
         #  for tree in self.mantraPanes
@@ -91,6 +98,8 @@ class MantraView
     if @parentElement
       @hideButtons @parentElement
 
+    showing = false
+
   hideButtons: (parent) ->
     for elem in parent.children
       unless elem
@@ -102,6 +111,10 @@ class MantraView
 
   # Append pane before the tree view
   show: ->
+    console.log("showing: " + showing)
+    if showing
+      return
+    showing = true
     Config.options = null # erase options
 
     @loadDirectories()
@@ -111,6 +124,8 @@ class MantraView
       @treeView.find('.tree-view-scroller').css 'background', treeView.treeView.find('.tree-view').css 'background'
       @parentElement = @treeView.element.querySelector('.tree-view-scroller .tree-view')
 
+      debugger
+      m = @element
       @parentElement.insertBefore(@element, @parentElement.firstChild)
 
       MantraView.treeView = @treeView.element
