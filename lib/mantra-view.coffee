@@ -25,6 +25,8 @@ class MantraView
 
     @paneSub = new CompositeDisposable
 
+    @currentPath = null
+
     #@loadDirectories()
     #
     # @paneSub.add atom.project.onDidChangePaths (path) =>
@@ -41,20 +43,26 @@ class MantraView
   loadDirectories: ->
     self = this
 
-    # DirectoryHandler.checkCreateFile("mantra.json", "templates/mantra.json")
-
-    # dir = DirectoryHandler.resolvePath("client/modules", true, true)
-    # unless fs.existsSync(dir)
-    #   atom.notifications.addWarning("This is not a Mantra project, client/modules directory missing!");
-    #   return
-
     # Remove all existing panels
     for tree in @mantraPanes
       tree.hide()
 
+    path = atom.project.resolvePath(".")
+
+    # if we are showing the same project, just show the previous panes
+    if path != @currentPath && @mantraPanes.length
+      for tree in @mantraPanes
+        tree.show()
+      return
+
+
+    # it is a new project, load new panes
+    currentPath = path
+
     self.mantraPanes = []
     atom.project.getDirectories().map (repo) ->
 
+      # if there are more projects opened, we only consider the first one
       if self.mantraPanes.length
         atom.notifications.addInfo "Ignoring " + repo.path
         return
@@ -111,11 +119,11 @@ class MantraView
 
   # Append pane before the tree view
   show: ->
+    Config.reset()
     console.log("showing: " + showing)
     if showing
       return
     showing = true
-    Config.options = null # erase options
 
     @loadDirectories()
 
@@ -124,7 +132,6 @@ class MantraView
       @treeView.find('.tree-view-scroller').css 'background', treeView.treeView.find('.tree-view').css 'background'
       @parentElement = @treeView.element.querySelector('.tree-view-scroller .tree-view')
 
-      debugger
       m = @element
       @parentElement.insertBefore(@element, @parentElement.firstChild)
 

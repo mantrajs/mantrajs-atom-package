@@ -46,20 +46,22 @@ class DirectoryHandler
     @clear(@container)
     @loadDirectory(@methodDir, @container)
 
-    $(@container).on 'click', '.list-item[is=tree-view-file]', (e) ->
-      DirectoryHandler.revealActiveFile(e)
-      e.stopPropagation();
-
-      atom.workspace.open(this.file.path)
-      this.getPath = () -> return this.file.path # TODO: Check other options
-      DirectoryHandler.select(this)
-
-      return false
-
-    $(@container).on 'contextmenu', '.list-item[is=tree-view-file]', (e) ->
-      atom.workspace.open(this.file.path)
-      DirectoryHandler.select(this)
-      DirectoryHandler.revealActiveFile(e)
+    # debugger
+    #
+    # $(@container).on 'click', '.list-item[is=tree-view-file]', (e) ->
+    #   DirectoryHandler.revealActiveFile(e)
+    #   e.stopPropagation()
+    #
+    #   atom.workspace.open(this.file.path)
+    #   this.getPath = () -> return this.file.path # TODO: Check other options
+    #   DirectoryHandler.select(this)
+    #
+    #   return false
+    #
+    # $(@container).on 'contextmenu', '.list-item[is=tree-view-file]', (e) ->
+    #   atom.workspace.open(this.file.path)
+    #   DirectoryHandler.select(this)
+    #   DirectoryHandler.revealActiveFile(e)
 
       #e.stopPropagation()
       #e.preventDefault()
@@ -110,12 +112,7 @@ class DirectoryHandler
         name = file.getBaseName()
         [rootProjectPath, relativeDirectoryPath] = atom.project.relativizePath(file.path)
 
-        if (@childTemplates && @childTemplates[name])
-          # this is template directory so create a new directory handler
-          console.log("Init: " + name + " : " + @childTemplates[name].callback)
-          new DirectoryHandler(name, container, relativeDirectoryPath, @childTemplates[name].file, @childTemplates, @childTemplates[name].callback, @childTemplates[name].options)
-        else
-          new DirectoryHandler(name, container, relativeDirectoryPath)
+        new DirectoryHandler(name, container, relativeDirectoryPath)
 
   create: (template, name, path) ->
     path = atom.project.resolvePath(path)
@@ -124,14 +121,40 @@ class DirectoryHandler
 
     lang = Config.get("language")
 
+    # this reloads the template if it was changed
+    template = Config.template template.name
+
     dialog = new AddDialog(path,
-      DirectoryHandler.resolvePath("/templates/$lang/parts"),
-      DirectoryHandler.resolvePath(template + ".$lang"),
-      name.toLowerCase()
+      @template,
+      name.toLowerCase(),
       @dialogOptions)
 
-    dialog.on "module-created", @callback
-    #dialog.on "module-created", @load
+    self = this
+    # when we have added file process all actios
+    dialog.on "module-created", (event, newPath) ->
+      name = fsPath.basename(newPath)
+      pname = name.split('.')[0] # filename without extension
+
+      if template.actions
+        for action in template.actions
+          debugger
+          aPath = action.path.replace /\$name/g, pname
+          aPath = fsPath.join path, aPath
+          orig_dname = fsPath.dirname(newPath)
+          new_dname = fsPath.dirname(aPath)
+
+          if action.type == 'create'
+            # check directory
+            DirectoryHandler.checkCreateDirectory(new_dname)
+            # create template text
+            newTemplate = action.text.replace /\$name/g, pname
+            DirectoryHandler.checkCreateFile(aPath, newTemplate)
+          if action.type == 'replace'
+            text = action.replace.replace /\$name/g, pname
+            text = text.replace /\\n/g, '\n'
+            # replace in file
+            DirectoryHandler.replaceInFile(aPath, action.what, text)
+      #dialog.on "module-created", @load
 
     dialog.attach()
 
@@ -148,21 +171,13 @@ class DirectoryHandler
       fs.ensureDirSync dirPath
       atom.notifications.addInfo "Mantra directory created: " + dir
 
-  @checkCreateFile: (file, template) ->
-    findFile = DirectoryHandler.resolvePath(file, true)
-    unless fs.existsSync findFile
-      template = DirectoryHandler.resolveName(template)
-
-      dir = fsPath.dirname(template)
-      file = fsPath.basename(template)
-
-      templateFile = atom.packages.resolvePackagePath("mantrajs/" + dir)
-      templateFile += "/" + file
-
-      [rootProjectPath, relativePath] = atom.project.relativizePath(findFile)
-
-      fs.copySync templateFile, findFile
-      atom.notifications.addInfo "Mantra file created: " + relativePath
+  @checkCreateFile: (file, text) ->
+    unless fs.existsSync file
+      atom.notifications.addInfo "Creating: " + file
+      fs.writeFile(file, text, 'utf8', (err) ->
+        if err
+          atom.notifications.addError err.message
+      )
 
   @resolveName: (path) ->
     if (path.indexOf("$lang") >= 0)
@@ -192,19 +207,15 @@ class DirectoryHandler
     DirectoryHandler.selectedElement.classList.add 'selected'
     DirectoryHandler.selectedElement.classList.add 'mselected'
 
-  @replaceInFile: (path, replacements) ->
-    fs.readFile(path, 'utf8', (err, data) ->
-      if err
-        return console.log(err)
+  @replaceInFile: (path, what, repl) ->
+    data = fs.readFileSync(path, 'utf8')
 
-      for i in [0...replacements.length/2]
-        data = data.replace(replacements[i*2], replacements[i*2+1])
+    # for i in [0...replacements.length/2]
+    #   data = data.replace(replacements[i*2], replacements[i*2+1])
+    data = data.replace(what, repl)
 
-      fs.writeFile(path, data, 'utf8', (err) ->
-        if err
-          return console.log(err)
-      )
-    )
+    fs.writeFileSync(path, data, 'utf8')
+
 
   @addFile: (parent, file) ->
     name = fsPath.basename(file.path)
@@ -222,7 +233,6 @@ class DirectoryHandler
     parent.appendChild listItem
 
   @createList: (headerText, parent, func) ->
-
     client = document.createElement('li')
 
     # header

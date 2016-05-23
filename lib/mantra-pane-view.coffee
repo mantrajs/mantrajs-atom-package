@@ -6,6 +6,7 @@ fspath = require('path')
 
 DirectoryHandler = require('./directoryHandler')
 ModuleHandler = require('./moduleHandler')
+PaneHandler = require('./paneHandler')
 Config = require('./configHandler')
 
 AddDialog = null  # Defer requiring until actually needed
@@ -42,26 +43,39 @@ class MantraPaneView
 
     @element.appendChild(header)
 
-    # load modules
-
-    moduleFields = document.createElement('div')
-    moduleFields.classList.add('mantra', 'atom-pane')
-    @element.appendChild(moduleFields)
-
-    DirectoryHandler.checkCreateDirectory(Config.get("root") + "client/configs")
-    DirectoryHandler.checkCreateFile(Config.get("root") + "client/configs/context.$lang", "templates/$lang/app/client/configs/context.$lang")
-
-    # DirectoryHandler.checkCreateFile(Config.get("root") + "client/main.$lang", "templates/$lang/app/client/main.$lang")
-
-    # check create module directory
+    # check create mantra directories
     DirectoryHandler.checkCreateDirectory(Config.get("root") + "client/modules")
-    moduleHandler = new ModuleHandler(moduleFields)
+    DirectoryHandler.checkCreateDirectory(Config.get("root") + "server")
 
-    # add server methods
+    # browse all defined panes and recreate them
+    for pane in Config.get("panes")
+      # add pane
+      paneFields = document.createElement('div')
+      paneFields.classList.add('mantra', 'atom-pane')
+      @element.appendChild(paneFields)
 
-    serverFields = document.createElement('div')
-    serverFields.classList.add('mantra', 'atom-pane')
-    @element.appendChild(serverFields)
+      if pane.name == "Module"
+        moduleHandler = new ModuleHandler(pane, paneFields)
+      else
+        paneHandler = new PaneHandler(pane, paneFields)
+
+    # add listener
+
+    $(@element).on 'click', '.list-item[is=tree-view-file]', (e) ->
+      DirectoryHandler.revealActiveFile(e)
+      e.stopPropagation()
+
+      atom.workspace.open(this.file.path)
+      this.getPath = () -> return this.file.path # TODO: Check other options
+      DirectoryHandler.select(this)
+
+      return false
+
+    $(@element).on 'contextmenu', '.list-item[is=tree-view-file]', (e) ->
+      atom.workspace.open(this.file.path)
+      DirectoryHandler.select(this)
+      DirectoryHandler.revealActiveFile(e)
+
 
     # add main server file
     # DirectoryHandler.checkCreateDirectory(Config.get("root") + "server/methods")
@@ -103,7 +117,7 @@ class MantraPaneView
     # )
 
     # add lib directory
-    new DirectoryHandler("library", serverFields, Config.get("root") + Config.get("libFolderName"))
+    # new DirectoryHandler("library", serverFields, Config.get("root") + Config.get("libFolderName"))
 
   setPane: (pane) ->
     @paneSub.add pane.observeActiveItem (item) =>

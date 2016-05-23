@@ -1,0 +1,262 @@
+root: ''
+panes:
+  - name: Module
+    structure:
+      - directory: actions
+        structure:
+          - file: index.ts
+            template: actionIndex
+      - directory: components
+      - directory: containers
+      - file: routes.tsx
+        template: route
+      - file: index.ts
+        template: module
+  - name: Server
+    structure:
+      - directory: server/publications
+      - directory: server/methods
+      - file: server/index.ts
+        template: server
+  - name: Configs
+    structure:
+      - directory: client/configs
+      - file: client/configs/context.ts
+        template: context
+      - file: client/index.ts
+        template: client
+
+templates:
+
+  # Module action template
+  - name: actions
+    text: |
+      class Actions {
+        create({Meteor, LocalState}: IContext, myParam: string) {
+        },
+      };
+      let actions = new Actions();
+      export default actions;
+    placeholders:
+    actions:
+      - type: replace
+        path: index.ts
+        what: const actions = {
+        replace: import $name from "./$name";\nconst actions = {
+      - type: replace
+        path: index.ts
+        what: const actions = {
+        replace: const actions = {\n $name,
+      - type: create
+        path: tests/$name_test.ts
+        text: |
+          // this is the test for $name
+  - name: actionIndex
+    create: true
+    text: |
+      const actions = {
+        // ACTION
+      };
+      export default actions;
+  # Module component template
+  - name: components
+    text: |
+      import React from "react";
+
+      interface IProps {
+      }
+
+      export default class $1 extends React.Component<IProps, {}> {
+        render() {
+          return (
+            <div></div>
+          );
+        }
+      }
+    placeholders:
+      - Component Name
+    actions:
+      - type: create
+        path: tests/$name_test.ts
+        text: |
+          // test for $name
+  # Module container template
+  - name: containers
+    text: |
+      import { useDeps, composeWithTracker, composeAll } from "../../../configs/context";
+      import Component, { IComponentProps, IComponentActions, IComponent } from "../components/$1";
+
+      interface IProps {
+        context?: () => IContext;
+        clearErrors: Function;
+      }
+
+      export const composer: IKomposer = ({context, clearErrors}: IProps, onData: IKomposerData<IComponent>) => {
+        const { Meteor, Collections }: IContext = context();
+        if (Meteor.subscribe("$3", postId).ready()) {
+          const options = {
+            sort: {createdAt: -1}
+          };
+          const data = {Collections.$2.find({$2}, options).fetch()};
+          onData(null, {data});
+        } else {
+          onData();
+        }
+
+        return clearErrors;
+      };
+
+      export const depsMapper = (context: IContext, actions: any): ISchedulesViewActions => ({
+        create: actions.schedule.create,
+        handleSearch: actions.schedule.handleSearch,
+        context: () => context
+      });
+
+      export default composeAll<IProps>(
+        composeWithTracker(composer),
+        useDeps(depsMapper)
+      )(Component);
+    placeholders:
+      - Component Name
+      - Collection Name
+      - Subscription
+
+  # Module route template
+  - name: route
+    show: true
+    create: true
+    text: |
+      import React from "react";
+      import { mount } from "mantra-core";
+
+      export default function (injectDeps: IInjectDeps) {
+        //const MainLayoutCtx = injectDeps(MainLayout);
+
+        // Move these as a module and call this from a main file
+        // FlowRouter.route("/", {
+        //   name: "ei.list",
+        //   action() {
+        //     mount(MainLayoutCtx, {
+        //       content: () => (<EiList />)
+        //     });
+        //   }
+        // });
+      }
+
+  # Module index template
+  - name: module
+    show: true
+    create: true
+    text: |
+      import actions from "./actions";
+      import routes from "./routes";
+
+      export default {
+        actions,
+        routes
+      };
+
+  # Server publication template
+  - name: server/publications
+    text: |
+      import {Meteor} from 'meteor/meteor';
+      import {check} from 'meteor/check';
+
+      export default function () {
+        Meteor.publish("$1", function () {
+          const selector = {};
+          const options = {
+            // fields: {_id: 1, title: 1},
+            // sort: {createdAt: -1},
+            // limit: 10
+          };
+
+          return $2.find(selector, options);
+        });
+      }
+    placeholders:
+      - Publication Name
+      - Collection
+
+  # Method template
+  - name: server/methods
+    text: |
+      import {Meteor} from 'meteor/meteor';
+      import {check} from 'meteor/check';
+
+      export default function () {
+        Meteor.methods({
+          '$1'($2) {
+            check($2, String);
+          }
+        });
+      }
+    placeholders:
+      - Method Name
+      - Parameters
+
+  # Server index template
+  - name: server
+    create: true
+    show: true
+    text: |
+      import publications from "./publications/index";
+      import methods from "./methods/index";
+      // import addInitialData from "./configs/initial_adds";
+
+      publications();
+      methods();
+      // addInitialData();
+
+  # context template
+  - name: context
+    create: true
+    text: |
+      import * as Collections from "../../common/collections";
+      import ApplicationState from "../utils/application_state";
+
+      import {Meteor} from 'meteor/meteor';
+      import {FlowRouter} from 'meteor/kadira:flow-router';
+      import {ReactiveDict} from 'meteor/reactive-dict';
+      import {Tracker} from 'meteor/tracker';
+
+      export { IKomposer, IKomposerData } from "mantra-core";
+
+      declare global {
+        export interface IContext {
+          Meteor: typeof Meteor;
+          FlowRouter: typeof FlowRouter;
+          Collections: typeof Collections;
+          LocalState: ReactiveDict;
+          Tracker: typeof Tracker;
+        }
+      }
+
+      export default function () {
+        return {
+          Meteor,
+          FlowRouter,
+          Collections,
+          LocalState: new ReactiveDict(),
+        };
+      }
+
+  # client index template
+  - name: client
+    create: true
+    show: true
+    text: |
+      import "./configs/config";
+
+      import coreModule from "./modules/core/index";
+      import initContext from "./configs/context";
+
+      // init context
+
+      const context = initContext();
+
+      // create app
+
+      const app = createApp(context);
+      app.loadModule(coreModule);
+      app.init();
