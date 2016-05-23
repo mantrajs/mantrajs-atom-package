@@ -7,6 +7,9 @@ panes:
           - file: index.ts
             template: actionIndex
       - directory: components
+        structure:
+          - file: stories/index.ts
+            template: storiesIndex
       - directory: containers
       - file: routes.tsx
         template: route
@@ -15,19 +18,25 @@ panes:
   - name: Server
     structure:
       - directory: server/publications
+        structure:
+          - file: index.ts
+            template: publicationIndex
       - directory: server/methods
+        structure:
+          - file: index.ts
+            template: methodIndex
       - file: server/index.ts
         template: server
   - name: Configs
     structure:
       - directory: client/configs
+      - directory: lib
       - file: client/configs/context.ts
         template: context
       - file: client/index.ts
         template: client
 
 templates:
-
   # Module action template
   - name: actions
     text: |
@@ -50,7 +59,23 @@ templates:
       - type: create
         path: tests/$name_test.ts
         text: |
-          // this is the test for $name
+          const {describe, it} = global;
+          import {expect} from 'chai';
+          import {spy, stub} from 'sinon';
+          import actions from '../posts';
+
+          describe('module.actions.actionSet', () => {
+            describe('create', () => {
+              it('should reject if title is not there', () => {
+                const LocalState = {set: spy()};
+                actions.create({LocalState}, null, 'content');
+                const args = LocalState.set.args[0];
+
+                expect(args[0]).to.be.equal('SAVING_ERROR');
+                expect(args[1]).to.match(/required/);
+              });
+            });
+          });
   - name: actionIndex
     create: true
     text: |
@@ -59,6 +84,10 @@ templates:
       };
       export default actions;
   # Module component template
+  - name: storiesIndex
+    create: true
+    text: |
+      // imports
   - name: components
     text: |
       import React from "react";
@@ -79,7 +108,36 @@ templates:
       - type: create
         path: tests/$name_test.ts
         text: |
-          // test for $name
+          const {describe, it} = global;
+          import {expect} from 'chai';
+          import {shallow} from 'enzyme';
+          import Component from '../$name';
+
+          describe('test', () => {
+            it('should display the post title', () => {
+              const el = shallow(<Component />);
+              expect(el).not.to.be.null;
+            });
+          });
+      - type: create
+        path: stories/$name_stories.ts
+        text: |
+          import React from 'react';
+          import { storiesOf, action } from '@kadira/storybook';
+          import Component from '../$name';
+
+          storiesOf('module.$name', module)
+            .add('default view', () => {
+              return (
+                <Component />
+              );
+            })
+      - type: replace
+        path: stories/index.ts
+        what: // imports
+        replace: |
+          // imports
+          import $name from "./$name_stories";
   # Module container template
   - name: containers
     text: |
@@ -120,7 +178,29 @@ templates:
       - Component Name
       - Collection Name
       - Subscription
+    actions:
+      - type: create
+        path: tests/$name_test.ts
+        text: |
+          const { describe, it } = global;
+          import {expect} from 'chai';
+          import {spy, stub} from 'sinon';
+          import {composer, depsMapper} from '../newpost';
 
+          describe('component', () => {
+            describe('composer', () => {
+              it('should get SAVING_ERROR from local state', () => {
+                const LocalState = {get: spy()};
+                const context = () => ({LocalState});
+
+                composer({context}, spy());
+
+                const args = LocalState.get.args[0];
+                expect(args).to.have.length(1);
+                expect(args[0]).to.be.equal('SAVING_ERROR');
+              });
+            });
+          });
   # Module route template
   - name: route
     show: true
@@ -177,7 +257,19 @@ templates:
     placeholders:
       - Publication Name
       - Collection
-
+    actions:
+      - type: replace
+        path: index.ts
+        what: export default function () {
+        replace: |
+          import $name from "./$name";
+          export default function () {
+      - type: replace
+        path: index.ts
+        what: export default function () {
+        replace: |
+          export default function () {
+            $name();
   # Method template
   - name: server/methods
     text: |
@@ -194,8 +286,19 @@ templates:
     placeholders:
       - Method Name
       - Parameters
-
-  # Server index template
+    actions:
+      - type: replace
+        path: index.ts
+        what: export default function () {
+        replace: >
+          import $name from "./$name";
+          export default function () {
+      - type: replace
+        path: index.ts
+        what: export default function () {
+        replace: >
+          export default function () {
+          $name();
   - name: server
     create: true
     show: true
@@ -207,6 +310,16 @@ templates:
       publications();
       methods();
       // addInitialData();
+  - name: publicationIndex
+    create: true
+    text: |
+      export default function () {
+      }
+  - name: methodIndex
+    create: true
+    text: |
+      export default function () {
+      }
 
   # context template
   - name: context

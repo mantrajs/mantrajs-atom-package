@@ -132,9 +132,7 @@ class DirectoryHandler
     self = this
     # when we have added file process all actios
     dialog.on "module-created", (event, newPath) ->
-
-
-      DirectoryHandler.executeActions(pname, template)
+      DirectoryHandler.executeActions(newPath, template)
       #dialog.on "module-created", @load
 
     dialog.attach()
@@ -218,7 +216,7 @@ class DirectoryHandler
 
     # for i in [0...replacements.length/2]
     #   data = data.replace(replacements[i*2], replacements[i*2+1])
-    data = data.replace(what, repl)
+    data = data.replace(what, repl.trim() + "\n")
 
     fs.writeFileSync(path, data, 'utf8')
 
@@ -255,7 +253,7 @@ class DirectoryHandler
       client.appendChild clientHeader
 
       #tests are collapsed, everything else is expanded
-      if headerText == "tests"
+      if headerText == "tests" || headerText == "stories"
         client.classList.add('mantra', 'list-nested-item', 'collapsed')
       else
         client.classList.add('mantra', 'list-nested-item', 'expanded')

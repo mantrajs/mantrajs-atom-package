@@ -50,10 +50,10 @@ class MantraView
     path = atom.project.resolvePath(".")
 
     # if we are showing the same project, just show the previous panes
-    if path != @currentPath && @mantraPanes.length
-      for tree in @mantraPanes
-        tree.show()
-      return
+    # if path != @currentPath && @mantraPanes.length
+    #   for tree in @mantraPanes
+    #     tree.show()
+    #   return
 
 
     # it is a new project, load new panes

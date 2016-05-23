@@ -55,6 +55,9 @@ class PaneHandler
     filePath = path.join dirPath, name
     filePath = atom.project.resolvePath(filePath)
 
+    dir = path.dirname filePath
+    DirectoryHandler.checkCreateDirectory dir
+
     # we can request whether the file exists
     # we can request whether the file will be displayed inside directory
     if template.create
