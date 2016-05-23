@@ -85,6 +85,10 @@ class ModuleHandler extends PaneHandler
       self.clear(self.container)
       self.loadPane(self.pane, relativeDirectoryPath, self.container)
 
+      # execute actions on module
+      template = Config.template('client')
+      DirectoryHandler.executeActions(newPath, template)
+
       # modify main.js
       # mainFile = DirectoryHandler.resolvePath("client/main.$lang", true, true)
       #

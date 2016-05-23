@@ -248,6 +248,8 @@ templates:
     text: |
       import "./configs/config";
 
+      import {createApp} from 'mantra-core';
+
       import coreModule from "./modules/core/index";
       import initContext from "./configs/context";
 
@@ -260,3 +262,16 @@ templates:
       const app = createApp(context);
       app.loadModule(coreModule);
       app.init();
+    actions:
+      - type: replace
+        path: ../index.ts
+        what: import {createApp} from 'mantra-core';
+        replace: |
+          import {createApp} from 'mantra-core';
+          import $nameModule from "./modules/$name";
+      - type: replace
+        path: ../index.ts
+        what: app.init();
+        replace: |
+          app.loadModule($nameModule);
+          app.init()

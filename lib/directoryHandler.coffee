@@ -132,28 +132,9 @@ class DirectoryHandler
     self = this
     # when we have added file process all actios
     dialog.on "module-created", (event, newPath) ->
-      name = fsPath.basename(newPath)
-      pname = name.split('.')[0] # filename without extension
 
-      if template.actions
-        for action in template.actions
-          debugger
-          aPath = action.path.replace /\$name/g, pname
-          aPath = fsPath.join path, aPath
-          orig_dname = fsPath.dirname(newPath)
-          new_dname = fsPath.dirname(aPath)
 
-          if action.type == 'create'
-            # check directory
-            DirectoryHandler.checkCreateDirectory(new_dname)
-            # create template text
-            newTemplate = action.text.replace /\$name/g, pname
-            DirectoryHandler.checkCreateFile(aPath, newTemplate)
-          if action.type == 'replace'
-            text = action.replace.replace /\$name/g, pname
-            text = text.replace /\\n/g, '\n'
-            # replace in file
-            DirectoryHandler.replaceInFile(aPath, action.what, text)
+      DirectoryHandler.executeActions(pname, template)
       #dialog.on "module-created", @load
 
     dialog.attach()
@@ -163,6 +144,31 @@ class DirectoryHandler
   clear: (elem) ->
     while (elem.firstChild)
       elem.removeChild(elem.firstChild)
+
+  @executeActions: (newPath, template) ->
+    name = fsPath.basename(newPath)
+    pname = name.split('.')[0] # filename without extension
+    dir = fsPath.dirname(newPath)
+
+    if template.actions
+      for action in template.actions
+        aPath = action.path.replace /\$name/g, pname
+        aPath = fsPath.join dir, aPath
+        orig_dname = fsPath.dirname(newPath)
+        new_dname = fsPath.dirname(aPath)
+
+        if action.type == 'create'
+          # check directory
+          DirectoryHandler.checkCreateDirectory(new_dname)
+          # create template text
+          newTemplate = action.text.replace /\$name/g, pname
+          DirectoryHandler.checkCreateFile(aPath, newTemplate)
+        if action.type == 'replace'
+          text = action.replace.replace /\$name/g, pname
+          text = text.replace /\\n/g, '\n'
+          # replace in file
+          DirectoryHandler.replaceInFile(aPath, action.what, text)
+    #dialog.on "module-created", @load
 
   @checkCreateDirectory: (dir) ->
     dirPath = DirectoryHandler.resolvePath(dir, true)
