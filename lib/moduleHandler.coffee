@@ -1,17 +1,19 @@
 {$} = require 'space-pen'
 DirectoryHandler = require('./directoryHandler')
 Config = require('./configHandler')
+PaneHandler = require('./paneHandler')
 
 fspath = require 'path'
 
 AddDialog = null
 
 module.exports =
-class ModuleHandler
-  constructor: (parent) ->
+class ModuleHandler extends PaneHandler
+  constructor: (pane, parent) ->
     self = this
 
     @path = DirectoryHandler.resolvePath("client/modules", false, true)
+    @pane = pane
 
     # add controls
     label = document.createElement('span')
@@ -19,7 +21,7 @@ class ModuleHandler
     parent.appendChild(label)
 
     # add button to add a module
-    @appendButton(parent, "NEW", @createModule)
+    @appendButton(parent, "NEW", @createModule.bind(this))
 
     # add combobox with all modules
     @moduleList = document.createElement('select')
@@ -42,17 +44,16 @@ class ModuleHandler
     @moduleDir.onDidChange(() -> self.load())
 
     @load()
-
-
-
   load: () ->
+    # clear all loaded modules
     @clear(@moduleList)
 
+    # find all modules in the directory
     files = @moduleDir.getEntriesSync()
 
     for file in files
       if file.isDirectory()
-        ModuleHandler.addModule(@moduleList, file)
+        ModuleHandler.addModule(@moduleList, file, file.getBaseName() == @selectedModule)
 
     # $(@container).on 'click', '.list-item[is=tree-view-file]', ->
     #   atom.workspace.open(this.file.path)
@@ -64,23 +65,37 @@ class ModuleHandler
 
     AddDialog ?= require './add-module-dialog'
     dialog = new AddDialog(path,
-      DirectoryHandler.resolvePath("/templates/$lang/parts/module"),
       null,
       "module")
 
+    self = this
     dialog.on "module-created", (event, newPath) ->
-      dialog.load()
-
-      # find the name of the new module
       name = fspath.basename(newPath)
 
-      # modify main.js
-      mainFile = DirectoryHandler.resolvePath("client/main.$lang", true, true)
+      # set selected module
+      self.selectedModule = name
 
-      DirectoryHandler.replaceInFile(mainFile, [
-          /(import \{createApp\} from ['"]mantra-core['"];)/, "$1\nimport " + name  + "Module from \"./modules/" + name + "\";",
-          "app.init();", "app.loadModule(" + name + "Module);\napp.init();"
-      ])
+      # reload modules
+      self.load()
+
+      # find the name of the new module
+      [rootProjectPath, relativeDirectoryPath] = atom.project.relativizePath(newPath)
+
+      # load this pane
+      self.clear(self.container)
+      self.loadPane(self.pane, relativeDirectoryPath, self.container)
+
+      # execute actions on module
+      template = Config.template('client')
+      DirectoryHandler.executeActions(newPath, template)
+
+      # modify main.js
+      # mainFile = DirectoryHandler.resolvePath("client/main.$lang", true, true)
+      #
+      # DirectoryHandler.replaceInFile(mainFile, [
+      #     /(import \{createApp\} from ['"]mantra-core['"];)/, "$1\nimport " + name  + "Module from \"./modules/" + name + "\";",
+      #     "app.init();", "app.loadModule(" + name + "Module);\napp.init();"
+      # ])
 
     dialog.attach()
 
@@ -94,26 +109,35 @@ class ModuleHandler
       return
 
     selectedPath = sel.selectedOptions[0].file.path
-
     [rootProjectPath, relativeDirectoryPath] = atom.project.relativizePath(selectedPath)
 
-    #new DirectoryHandler("Actions", @container, relativeDirectoryPath + "/actions", "action.js")
-    #new DirectoryHandler("Components", @container, relativeDirectoryPath + "/components", "component.js")
-    #new DirectoryHandler("Configs", @container, relativeDirectoryPath + "/configs")
-    #new DirectoryHandler("Containers", @container, relativeDirectoryPath + "/containers", "container.js")
+    @loadPane(@pane, relativeDirectoryPath, @container)
 
-    self = this
-    new DirectoryHandler(null, @container, relativeDirectoryPath, null, {
-      "actions":
-        "file": "action",
-        "callback": (e, newPath) -> self.updateAction(e, newPath)
-      "components":
-        "file": "component"
-        "options": ["Class Name"]
-      "containers":
-        "file": "container"
-        "options": ["Component Name", "Parameters", "Subscription", "Collection"]
-    })
+  loadPane: (pane, dir, container) ->
+    for item in pane.structure
+      if item.directory
+        @checkDirectory(item, dir, container)
+      if item.file
+        @checkFile(item, dir, container)
+
+    #
+    # #new DirectoryHandler("Actions", @container, relativeDirectoryPath + "/actions", "action.js")
+    # #new DirectoryHandler("Components", @container, relativeDirectoryPath + "/components", "component.js")
+    # #new DirectoryHandler("Configs", @container, relativeDirectoryPath + "/configs")
+    # #new DirectoryHandler("Containers", @container, relativeDirectoryPath + "/containers", "container.js")
+    #
+    # self = this
+    # new DirectoryHandler(null, @container, relativeDirectoryPath, null, {
+    #   "actions":
+    #     "file": "action",
+    #     "callback": (e, newPath) -> self.updateAction(e, newPath)
+    #   "components":
+    #     "file": "component"
+    #     "options": ["Class Name"]
+    #   "containers":
+    #     "file": "container"
+    #     "options": ["Component Name", "Parameters", "Subscription", "Collection"]
+    # })
 
   updateAction: (e, newPath) ->
     # modify main.js
@@ -132,10 +156,12 @@ class ModuleHandler
     while (elem.firstChild)
       elem.removeChild(elem.firstChild)
 
-  @addModule: (parent, file) ->
+  @addModule: (parent, file, selected) ->
     listItem = document.createElement('option')
     listItem.file = file
     listItem.innerText = file.getBaseName()
+    if selected
+      listItem.setAttribute('selected', selected)
     parent.appendChild listItem
 
   appendButton: (parent, text, func) ->

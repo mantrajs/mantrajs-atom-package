@@ -1,69 +1,3 @@
-# Mantra extensions for Meteor developers
-
-## Quickstart
-
-1. Install plugin in Atom
-2. Set your project type in the plugin preferences page (Javascript/Typescript/Redux/Apollo)
-3. Start the plugin with "ctrl+alt+o"
-4. If you are starting with a fresh project let plugin create all files for you
-5. KNOWN ISSUE: When you let plugin create all files for you you need to toggle it once more, otherwise this step is not necessary
-
-**IMPORTANT:** Currently works only with the default theme (e.g. Material design theme not supported)
-**IMPORTANT:** Previous CSON configuration needs to be rewritten in YAML
-
-## Functionality:
-
-- custom pane to display Mantra modules and components
-- automatically generate a module
-- automatically generate module components from the menu
-- **NEW: automatically generate tests and stories**
-- **NEW: support for various project types**
-- generate server components
-- several snippets for mantra components ()
-- init a new mantra app automatically
-- **NEW: easy definition of any mantra component via YAML**
-
-
-1. Code generation - It is possible now to modify the generated code based on placeholders (*here I would like feedback on possible template structure and placeholders*). Also, please not, how components are automatically registered inside index.js
-
-  ![components](https://cloud.githubusercontent.com/assets/2682705/12999539/9f73196c-d1a4-11e5-9a49-8d898d40904e.gif)
-
-2. Similar functionality for modifying placeholders works for module components
-
-  ![modulecomponents](https://cloud.githubusercontent.com/assets/2682705/12999551/b5078e8e-d1a4-11e5-8187-520b4337a94b.gif)
-
-3. When new module is created it automatically creates all necessary directories and register module in `main.js` of the mantra app
-
-  ![modulenew](https://cloud.githubusercontent.com/assets/2682705/12999570/e1bd8050-d1a4-11e5-9bad-0c497e632d76.gif)
-
-4. It is possible to initialise all directories and mantra files in the empty Meteor project just by toggling the mantra plugin
-
-  ![lazyinit](https://cloud.githubusercontent.com/assets/2682705/12999580/f4a0b930-d1a4-11e5-922a-9411fc374425.gif)
-
-5. Mantra plugin settings are kept in the mantra.json file
-
-6. Context menu was disabled in mantra pane, as this led to problems with file deletion, which often led to unexpected deletes.
-
-## Configuration:
-
-Plugin can be easily customised by creating a *mantra.yaml* file in the project root. In the configuration, you first define the structure of the panes that will be displayed, then you define following parameters:
-
-1. For each directory you can define a template file with placeholders that will be created when pressing the "NEW" button on the directory
-2. For each file you define the default content in the template
-3. Files can be nested in the directories
-
-For each template you define following parameters:
-
-1. *name* - name of the template
-2. *text* - text of the templete. You can use $1, $2 for the placeholders
-3. *placeholders* - array of placeholders that replce $1, $2 from above
-4. *create* - file is created by default when it does not exist
-5. *show* - shows in the pane view. If this file is part of the already visible directory this has no effect
-6. *actions* - define triggers when the file is created. This can either be *create* or *replace*. Create action creates extra files. Replace action replaces content in existing files.
-
-Checkout extra configuration in the project repository. Following is an exemplary configuration for the "Classic Mantra Javascript" project.
-
-```yaml
 root: ''
 panes:
   - name: Module
@@ -158,16 +92,11 @@ templates:
     text: |
       import React from "react";
 
-      interface IProps {
-      }
+      const Component = () => (
+        <div></div>
+      )
 
-      export default class $1 extends React.Component {
-        render() {
-          return (
-            <div></div>
-          );
-        }
-      }
+      export default Component;
     placeholders:
       - Component Name
     actions:
@@ -441,4 +370,3 @@ templates:
         replace: |
           app.loadModule($nameModule);
           app.init()
-```
