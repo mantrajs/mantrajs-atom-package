@@ -194,7 +194,7 @@ class DirectoryHandler
     path = DirectoryHandler.resolveName(path)
 
     if (addRoot)
-      path = Config.get("root") + path
+      path = fsPath.join Config.get("root"), path
 
     if absolute
       return atom.project.resolvePath(path)
