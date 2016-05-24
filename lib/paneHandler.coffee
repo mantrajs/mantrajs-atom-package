@@ -34,7 +34,7 @@ class PaneHandler
     handler = new DirectoryHandler(
       bname,
       paneFields,
-      Config.path(directoryPath),
+      directoryPath,
       template
     )
 
