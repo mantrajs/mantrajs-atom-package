@@ -6,18 +6,10 @@ Config = require './configHandler'
 
 module.exports = TreeViewGitModified =
   config:
-    language:
+    projectType:
       type: 'string'
-      default: 'Javascript'
-      enum: ["Javascript", "Typescript"]
-    projectRoot:
-      type: 'string'
-      default: ''
-      description: "Defines the directory which is root to server/client and lib folder"
-    libFolderName:
-      type: 'string'
-      default: 'lib'
-      description: "Defines the name of the lib folder"
+      default: 'Classic Mantra (JS)'
+      enum: ["Classic Mantra (JS)", "Classic Mantra (TS)"]
 
   mantraTreeView: null
   subscriptions: null
@@ -32,9 +24,6 @@ module.exports = TreeViewGitModified =
 
     # Register command that toggles this view
     @subscriptions.add atom.commands.add 'atom-workspace', 'mantrajs:toggle': => @toggle()
-    @subscriptions.add atom.commands.add 'atom-workspace', 'mantrajs:init': => @init()
-    @subscriptions.add atom.commands.add 'atom-workspace', 'mantrajs:show': => @show()
-    @subscriptions.add atom.commands.add 'atom-workspace', 'mantrajs:hide': => @hide()
 
     @subscriptions.add atom.project.onDidChangePaths (path) =>
       @show()
@@ -82,16 +71,3 @@ module.exports = TreeViewGitModified =
   hide: ->
     @mantraTreeView.hide()
     @isVisible = false
-
-  init: ->
-    pathFrom = atom.packages.resolvePackagePath("mantrajs/templates/app/client")
-    pathTo =  atom.project.resolvePath("client")
-    fs.copySync(pathFrom, pathTo)
-
-    pathFrom = atom.packages.resolvePackagePath("mantrajs/templates/app/server")
-    pathTo =  atom.project.resolvePath("server")
-    fs.copySync(pathFrom, pathTo)
-
-    pathFrom = atom.packages.resolvePackagePath("mantrajs/templates/app/lib")
-    pathTo =  atom.project.resolvePath("lib")
-    fs.copySync(pathFrom, pathTo)

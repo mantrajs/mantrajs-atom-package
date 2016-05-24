@@ -1,3 +1,7 @@
+## 0.0.9
+* Major rewrite, fully customizable panes
+* Configuration via YAML
+
 ## 0.1.4
 * Improved visual components
 
