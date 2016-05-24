@@ -15,10 +15,15 @@ class ConfigHandler
     ConfigHandler.systemConfig = null
   @path: (filePath) ->
     return path.join ConfigHandler.get('root'), filePath
+  @settingFile: () ->
+    setting = atom.config.get("mantrajs.projectType")
+    switch setting
+      when "Classic Mantra (TS)" then return "configs/mantra-ts.yaml"
+      else return "configs/mantra-js.yaml"
   @get: (key) ->
     if ConfigHandler.systemConfig == null
       packagePath = atom.packages.resolvePackagePath("mantrajs")
-      configPath = path.join packagePath, 'mantra.yaml'
+      configPath = path.join packagePath, ConfigHandler.settingFile()
       try
         ConfigHandler.systemConfig = YAML.load(configPath)
       catch e
@@ -27,8 +32,11 @@ class ConfigHandler
       configPath = atom.project.resolvePath("mantra.yaml")
       try
         fs.accessSync configPath, fs.F_OK
-        ConfigHandler.userConfig = YAML.load(configPath)
+        try
+          ConfigHandler.userConfig = YAML.load(configPath)
+        catch e
+          atom.notifications.addError "Error parsing user config: " + e.message
       catch e
-        atom.notifications.addError "Error parsing system config: " + e.message
+        ConfigHandler.userConfig = {}
     # return the value
     return if ConfigHandler.userConfig[key] then ConfigHandler.userConfig[key] else ConfigHandler.systemConfig[key]
