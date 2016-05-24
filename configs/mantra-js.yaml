@@ -4,36 +4,36 @@ panes:
     structure:
       - directory: actions
         structure:
-          - file: index.ts
+          - file: index.js
             template: actionIndex
       - directory: components
         structure:
-          - file: stories/index.ts
+          - file: stories/index.js
             template: storiesIndex
       - directory: containers
-      - file: routes.tsx
+      - file: routes.js
         template: route
-      - file: index.ts
+      - file: index.js
         template: module
   - name: Server
     structure:
       - directory: server/publications
         structure:
-          - file: index.ts
+          - file: index.js
             template: publicationIndex
       - directory: server/methods
         structure:
-          - file: index.ts
+          - file: index.js
             template: methodIndex
-      - file: server/index.ts
+      - file: server/index.js
         template: server
   - name: Configs
     structure:
       - directory: client/configs
       - directory: lib
-      - file: client/configs/context.ts
+      - file: client/configs/context.js
         template: context
-      - file: client/index.ts
+      - file: client/index.js
         template: client
 
 templates:
@@ -49,15 +49,15 @@ templates:
     placeholders:
     actions:
       - type: replace
-        path: index.ts
+        path: index.js
         what: const actions = {
         replace: import $name from "./$name";\nconst actions = {
       - type: replace
-        path: index.ts
+        path: index.js
         what: const actions = {
         replace: const actions = {\n $name,
       - type: create
-        path: tests/$name_test.ts
+        path: tests/$name_test.js
         text: |
           const {describe, it} = global;
           import {expect} from 'chai';
@@ -101,7 +101,7 @@ templates:
       - Component Name
     actions:
       - type: create
-        path: tests/$name_test.ts
+        path: tests/$name_test.js
         text: |
           const {describe, it} = global;
           import {expect} from 'chai';
@@ -115,7 +115,7 @@ templates:
             });
           });
       - type: create
-        path: stories/$name_stories.ts
+        path: stories/$name_stories.js
         text: |
           import React from 'react';
           import { storiesOf, action } from '@kadira/storybook';
@@ -128,7 +128,7 @@ templates:
               );
             })
       - type: replace
-        path: stories/index.ts
+        path: stories/index.js
         what: // imports
         replace: |
           // imports
@@ -138,11 +138,6 @@ templates:
     text: |
       import { useDeps, composeWithTracker, composeAll } from "../../../configs/context";
       import Component from "../components/$1";
-
-      interface IProps {
-        context?: () => IContext;
-        clearErrors: Function;
-      }
 
       export const composer = ({context, clearErrors}, onData) => {
         const { Meteor, Collections } = context();
@@ -175,7 +170,7 @@ templates:
       - Subscription
     actions:
       - type: create
-        path: tests/$name_test.ts
+        path: tests/$name_test.js
         text: |
           const { describe, it } = global;
           import {expect} from 'chai';
@@ -254,13 +249,13 @@ templates:
       - Collection
     actions:
       - type: replace
-        path: index.ts
+        path: index.js
         what: export default function () {
         replace: |
           import $name from "./$name";
           export default function () {
       - type: replace
-        path: index.ts
+        path: index.js
         what: export default function () {
         replace: |
           export default function () {
@@ -283,13 +278,13 @@ templates:
       - Parameters
     actions:
       - type: replace
-        path: index.ts
+        path: index.js
         what: export default function () {
         replace: >
           import $name from "./$name";
           export default function () {
       - type: replace
-        path: index.ts
+        path: index.js
         what: export default function () {
         replace: >
           export default function () {
@@ -359,13 +354,13 @@ templates:
       app.init();
     actions:
       - type: replace
-        path: ../index.ts
+        path: ../index.js
         what: import {createApp} from 'mantra-core';
         replace: |
           import {createApp} from 'mantra-core';
           import $nameModule from "./modules/$name";
       - type: replace
-        path: ../index.ts
+        path: ../index.js
         what: app.init();
         replace: |
           app.loadModule($nameModule);
