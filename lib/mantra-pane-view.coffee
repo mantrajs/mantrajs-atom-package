@@ -44,8 +44,8 @@ class MantraPaneView
     @element.appendChild(header)
 
     # check create mantra directories
-    DirectoryHandler.checkCreateDirectory(Config.get("root") + "client/modules")
-    DirectoryHandler.checkCreateDirectory(Config.get("root") + "server")
+    DirectoryHandler.checkCreateDirectory(fspath.join Config.get("root"), "client/modules")
+    DirectoryHandler.checkCreateDirectory(fspath.join Config.get("root"), "server")
 
     # browse all defined panes and recreate them
     for pane in Config.get("panes")
