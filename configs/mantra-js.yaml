@@ -8,7 +8,7 @@ panes:
             template: actionIndex
       - directory: components
         structure:
-          - file: stories/index.js
+          - file: .stories/index.js
             template: storiesIndex
       - directory: containers
       - file: routes.js
@@ -115,7 +115,7 @@ templates:
             });
           });
       - type: create
-        path: stories/$name_stories.js
+        path: .stories/$name_stories.js
         text: |
           import React from 'react';
           import { storiesOf, action } from '@kadira/storybook';
@@ -128,7 +128,7 @@ templates:
               );
             })
       - type: replace
-        path: stories/index.js
+        path: .stories/index.js
         what: // imports
         replace: |
           // imports
