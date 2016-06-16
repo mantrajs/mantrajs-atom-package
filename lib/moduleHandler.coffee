@@ -83,7 +83,7 @@ class ModuleHandler extends PaneHandler
 
       # load this pane
       self.clear(self.container)
-      self.loadPane(self.pane, relativeDirectoryPath, self.container)
+      self.loadPane(self.pane, relativeDirectoryPath, self.container, true)
 
       # execute actions on module
       template = Config.template('client')
@@ -111,14 +111,14 @@ class ModuleHandler extends PaneHandler
     selectedPath = sel.selectedOptions[0].file.path
     [rootProjectPath, relativeDirectoryPath] = atom.project.relativizePath(selectedPath)
 
-    @loadPane(@pane, relativeDirectoryPath, @container)
+    @loadPane(@pane, relativeDirectoryPath, @container, false)
 
-  loadPane: (pane, dir, container) ->
+  loadPane: (pane, dir, container, createEntries) ->
     for item in pane.structure
       if item.directory
-        @checkDirectory(item, dir, container)
+        @checkDirectory(item, dir, container, createEntries)
       if item.file
-        @checkFile(item, dir, container)
+        @checkFile(item, dir, container, createEntries)
 
     #
     # #new DirectoryHandler("Actions", @container, relativeDirectoryPath + "/actions", "action.js")

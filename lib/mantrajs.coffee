@@ -9,7 +9,10 @@ module.exports = TreeViewGitModified =
     projectType:
       type: 'string'
       default: 'Classic Mantra (JS)'
-      enum: ["Classic Mantra (JS)", "Classic Mantra (TS)"]
+      enum: [
+        "Classic Mantra (JS)",
+        "Classic Mantra (TS)",
+        "Mantra (TS) - No Stories"]
 
   mantraTreeView: null
   subscriptions: null

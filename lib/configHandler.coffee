@@ -17,8 +17,10 @@ class ConfigHandler
     return path.join ConfigHandler.get('root'), filePath
   @settingFile: () ->
     setting = atom.config.get("mantrajs.projectType")
+    console.log(setting)
     switch setting
       when "Classic Mantra (TS)" then return "configs/mantra-ts.yaml"
+      when "Mantra (TS) - No Stories" then return "configs/mantra-ts-ns.yaml"
       else return "configs/mantra-js.yaml"
   @get: (key) ->
     if ConfigHandler.systemConfig == null

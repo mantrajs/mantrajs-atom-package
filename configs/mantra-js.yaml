@@ -51,7 +51,7 @@ templates:
       - type: replace
         path: index.js
         what: const actions = {
-        replace: import $name from "./$name";\nconst actions = {
+        replace: import $name from './$name';\nconst actions = {
       - type: replace
         path: index.js
         what: const actions = {
@@ -90,7 +90,7 @@ templates:
       // imports
   - name: components
     text: |
-      import React from "react";
+      import React from 'react';
 
       const Component = () => (
         <div></div>
@@ -132,16 +132,16 @@ templates:
         what: // imports
         replace: |
           // imports
-          import $name from "./$name_stories";
+          import $name from './$name_stories';
   # Module container template
   - name: containers
     text: |
-      import { useDeps, composeWithTracker, composeAll } from "../../../configs/context";
-      import Component from "../components/$1";
+      import { useDeps, composeWithTracker, composeAll } from '../../../configs/context';
+      import Component from '../components/$1';
 
       export const composer = ({context, clearErrors}, onData) => {
         const { Meteor, Collections } = context();
-        if (Meteor.subscribe("$3", postId).ready()) {
+        if (Meteor.subscribe('$3', postId).ready()) {
           const options = {
             sort: {createdAt: -1}
           };
@@ -196,15 +196,15 @@ templates:
     show: true
     create: true
     text: |
-      import React from "react";
-      import { mount } from "mantra-core";
+      import React from 'react';
+      import { mount } from 'mantra-core';
 
       export default function (injectDeps) {
         //const MainLayoutCtx = injectDeps(MainLayout);
 
         // Move these as a module and call this from a main file
-        // FlowRouter.route("/", {
-        //   name: "ei.list",
+        // FlowRouter.route('/', {
+        //   name: 'ei.list',
         //   action() {
         //     mount(MainLayoutCtx, {
         //       content: () => (<EiList />)
@@ -218,8 +218,8 @@ templates:
     show: true
     create: true
     text: |
-      import actions from "./actions";
-      import routes from "./routes";
+      import actions from './actions';
+      import routes from './routes';
 
       export default {
         actions,
@@ -233,7 +233,7 @@ templates:
       import {check} from 'meteor/check';
 
       export default function () {
-        Meteor.publish("$1", function () {
+        Meteor.publish('$1', function () {
           const selector = {};
           const options = {
             // fields: {_id: 1, title: 1},
@@ -252,7 +252,7 @@ templates:
         path: index.js
         what: export default function () {
         replace: |
-          import $name from "./$name";
+          import $name from './$name';
           export default function () {
       - type: replace
         path: index.js
@@ -281,7 +281,7 @@ templates:
         path: index.js
         what: export default function () {
         replace: >
-          import $name from "./$name";
+          import $name from './$name';
           export default function () {
       - type: replace
         path: index.js
@@ -293,9 +293,9 @@ templates:
     create: true
     show: true
     text: |
-      import publications from "./publications/index";
-      import methods from "./methods/index";
-      // import addInitialData from "./configs/initial_adds";
+      import publications from './publications/index';
+      import methods from './methods/index';
+      // import addInitialData from './configs/initial_adds';
 
       publications();
       methods();
@@ -315,7 +315,7 @@ templates:
   - name: context
     create: true
     text: |
-      import * as Collections from "../../lib/collections";
+      import * as Collections from '../../lib/collections';
 
       import {Meteor} from 'meteor/meteor';
       import {FlowRouter} from 'meteor/kadira:flow-router';
@@ -336,12 +336,12 @@ templates:
     create: true
     show: true
     text: |
-      import "./configs/config";
+      import './configs/config';
 
       import {createApp} from 'mantra-core';
 
-      import coreModule from "./modules/core/index";
-      import initContext from "./configs/context";
+      import coreModule from './modules/core/index';
+      import initContext from './configs/context';
 
       // init context
 
@@ -358,7 +358,7 @@ templates:
         what: import {createApp} from 'mantra-core';
         replace: |
           import {createApp} from 'mantra-core';
-          import $nameModule from "./modules/$name";
+          import $nameModule from './modules/$name';
       - type: replace
         path: ../index.js
         what: app.init();

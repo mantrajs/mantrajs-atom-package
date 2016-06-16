@@ -19,7 +19,7 @@ class PaneHandler
       if item.file
         @checkFile(item, Config.get('root'), paneFields)
 
-  checkDirectory: (item, parentPath, paneFields) ->
+  checkDirectory: (item, parentPath, paneFields, createEntry) ->
     templates = Config.get('templates')
     name = item.directory
     bname = path.basename item.directory
@@ -27,8 +27,9 @@ class PaneHandler
     template = _.find(templates, (im) -> im.name == tname)
     directoryPath = path.join parentPath, name
 
-    # check if directory exists
-    DirectoryHandler.checkCreateDirectory(directoryPath)
+    # check if directory exists and create if requested
+    if createEntry
+      DirectoryHandler.checkCreateDirectory(directoryPath)
 
     # add directory handler
     handler = new DirectoryHandler(
@@ -46,7 +47,7 @@ class PaneHandler
         if child.file
           @checkFile(child, directoryPath, paneFields)
 
-  checkFile: (item, dirPath, paneFields) ->
+  checkFile: (item, dirPath, paneFields, createEntry) ->
     templates = Config.get('templates')
     name = item.file
     bname = path.basename item.file
@@ -56,11 +57,12 @@ class PaneHandler
     filePath = atom.project.resolvePath(filePath)
 
     dir = path.dirname filePath
-    DirectoryHandler.checkCreateDirectory dir
+    if createEntry
+      DirectoryHandler.checkCreateDirectory dir
 
     # we can request whether the file exists
     # we can request whether the file will be displayed inside directory
-    if template.create
+    if createEntry && template.create
       try
         fs.accessSync filePath, fs.F_OK
       catch e
@@ -71,14 +73,18 @@ class PaneHandler
         )
 
     if template.show
-      # we have to find the file in the atom project
-      [rootPath, relativePath] = atom.project.relativizePath(filePath)
-      # get only the directory path
-      dirName = path.dirname relativePath
-      # find the firectory
-      dir = atom.project.getDirectories()[0].getSubdirectory(dirName)
-      # find the file
-      fileName = path.basename relativePath
-      f = dir.getFile fileName
-      # append to the pane
-      DirectoryHandler.addFile(paneFields, f)
+      try
+        fs.accessSync filePath, fs.F_OK
+        # we have to find the file in the atom project
+        [rootPath, relativePath] = atom.project.relativizePath(filePath)
+        # get only the directory path
+        dirName = path.dirname relativePath
+        # find the firectory
+        dir = atom.project.getDirectories()[0].getSubdirectory(dirName)
+        # find the file
+        fileName = path.basename relativePath
+        f = dir.getFile fileName
+        # append to the pane
+        DirectoryHandler.addFile(paneFields, f)
+      catch e
+        # do nothing

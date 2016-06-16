@@ -7,9 +7,6 @@ panes:
           - file: index.ts
             template: actionIndex
       - directory: components
-        structure:
-          - file: stories/index.ts
-            template: storiesIndex
       - directory: containers
       - file: routes.tsx
         template: route
@@ -84,10 +81,6 @@ templates:
       };
       export default actions;
   # Module component template
-  - name: storiesIndex
-    create: true
-    text: |
-      // imports
   - name: components
     text: |
       import React from 'react';
@@ -117,25 +110,6 @@ templates:
               expect(el).not.to.be.null;
             });
           });
-      - type: create
-        path: stories/$name_stories.ts
-        text: |
-          import React from 'react';
-          import { storiesOf, action } from '@kadira/storybook';
-          import Component from '../$name';
-
-          storiesOf('module.$name', module)
-            .add('default view', () => {
-              return (
-                <Component />
-              );
-            })
-      - type: replace
-        path: stories/index.ts
-        what: // imports
-        replace: |
-          // imports
-          import $name from './$name_stories';
   # Module container template
   - name: containers
     text: |
@@ -359,7 +333,7 @@ templates:
     text: |
       import './configs/config';
 
-      import {createApp} from 'mantra-core';
+      import { createApp } from 'mantra-core';
 
       import coreModule from './modules/core/index';
       import initContext from './configs/context';
@@ -376,9 +350,9 @@ templates:
     actions:
       - type: replace
         path: ../index.ts
-        what: import {createApp} from 'mantra-core';
+        what: import { createApp } from 'mantra-core';
         replace: |
-          import {createApp} from 'mantra-core';
+          import { createApp } from 'mantra-core';
           import $nameModule from './modules/$name';
       - type: replace
         path: ../index.ts
