@@ -84,7 +84,7 @@ class DirectoryHandler
     for pathComponent in activePathComponents
       currentPath += fsPath.sep + pathComponent
       entry = DirectoryHandler.entryForPath(currentPath)
-      if entry.expand
+      if entry && entry.expand
         entry.expand()
 
   @entryForPath: (entryPath) ->
