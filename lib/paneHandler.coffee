@@ -30,6 +30,10 @@ class PaneHandler
     # check if directory exists and create if requested
     if createEntry
       DirectoryHandler.checkCreateDirectory(directoryPath)
+    else
+      dirPath = DirectoryHandler.resolvePath(directoryPath, true)
+      unless fs.existsSync(dirPath)
+        return
 
     # add directory handler
     handler = new DirectoryHandler(
